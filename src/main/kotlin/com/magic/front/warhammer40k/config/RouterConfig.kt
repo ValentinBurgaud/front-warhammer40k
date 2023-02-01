@@ -32,11 +32,6 @@ internal class RouterConfig {
                     GET("", cardHandler::getCardWarhammer40kById)
                 }
             }
-            "/test".nest {
-                accept(MediaType.APPLICATION_JSON).nest {
-                    GET("", cardHandler::listCardWarhammer40k)
-                }
-            }
         }.mesure()
     }
 }

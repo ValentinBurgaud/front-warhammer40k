@@ -19,8 +19,6 @@ dependencies {
     implementation(files("libs/altima-lib-toolbox-2.2.1-SNAPSHOT.jar"))
     implementation(files("libs/json-lib-1.0.4.jar"))
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-web-services'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
@@ -29,6 +27,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
     implementation 'io.vavr:vavr-kotlin:0.10.2'
     implementation 'io.vavr:vavr:0.10.0'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'joda-time:joda-time:2.12.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
 }
