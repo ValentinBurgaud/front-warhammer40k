@@ -1,0 +1,25 @@
+on:
+  milestone:
+    types: [closed]
+name: Generate Release Note
+jobs:
+  create-release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Create Release Notes
+        uses: docker://decathlon/release-notes-generator-action:3.1.3
+        env:
+          GITHUB_TOKEN: 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
+          OUTPUT_FOLDER: temp_release_notes
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: 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
+        with:
+          tag_name: V${{ github.event.milestone.title }}
+          release_name: ${{ github.event.milestone.title }}.RELEASE
+          body_path: temp_release_notes/release_file.md
+          draft: false
+          prerelease: false
