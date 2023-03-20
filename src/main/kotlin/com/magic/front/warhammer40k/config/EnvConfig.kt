@@ -2,6 +2,7 @@ package com.magic.front.warhammer40k.config
 
 import com.magic.front.warhammer40k.config.domain.Env
 import com.magic.front.warhammer40k.config.domain.apiKeyConfigBuilder
+import com.magic.front.warhammer40k.config.domain.dataSourceConfigBuilder
 import com.magic.front.warhammer40k.config.domain.envBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -25,6 +26,16 @@ class EnvConfig(
             magicApiConfig(
                 apiKeyConfigBuilder {
                     baseUrl("https://api.magicthegathering.io")
+                }
+            )
+            dataSourceConfig(
+                dataSourceConfigBuilder {
+                    db("warhammer40k")
+                    port(5432)
+                    host("localhost")
+                    username("warhammer40k")
+                    password("warhammer40k")
+                    maximumPoolSize(10)
                 }
             )
         }
