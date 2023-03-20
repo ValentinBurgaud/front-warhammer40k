@@ -5,11 +5,13 @@ class Env constructor(builder: Builder) {
     val env: String
     val appName: String
     val magicApiConfig: ApiKeyConfig
+    val dataSourceConfig: DataSourceConfig
 
     init {
         env = builder.env
         appName = builder.appName
         magicApiConfig = builder.magicApiConfig
+        dataSourceConfig = builder.dataSourceConfig
     }
 
     val isLocal = env == "local"
@@ -18,6 +20,7 @@ class Env constructor(builder: Builder) {
         internal var env: String = ""
         internal var appName: String = ""
         internal var magicApiConfig: ApiKeyConfig = apiKeyConfigBuilder { }
+        internal var dataSourceConfig: DataSourceConfig = dataSourceConfigBuilder { }
 
         fun build(): Env {
             return Env(this)
@@ -35,6 +38,11 @@ class Env constructor(builder: Builder) {
 
         fun magicApiConfig(magicApiConfig: ApiKeyConfig): Builder {
             this.magicApiConfig = magicApiConfig
+            return this
+        }
+
+        fun dataSourceConfig(dataSourceConfig: DataSourceConfig): Builder {
+            this.dataSourceConfig = dataSourceConfig
             return this
         }
     }
