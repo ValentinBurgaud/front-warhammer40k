@@ -1,7 +1,9 @@
 package com.magic.front.warhammer40k.model
 
 import io.vavr.control.Option
+import io.vavr.kotlin.option
 import io.vavr.kotlin.toVavrList
+import io.vertx.sqlclient.Row
 import org.reactivecouchbase.json.JsArray
 import org.reactivecouchbase.json.JsValue
 import org.reactivecouchbase.json.Json
@@ -80,6 +82,33 @@ data class Card(
                     card.toJson()
                 }.toVavrList())
             }
+        }
+
+        fun fromBdd(row: Row): Card {
+            return Card(
+                id = row.getUUID("id"),
+                name = row.getString("name"),
+                manaCost = row.getString("manaCost"),
+                cmc = row.getBigDecimal("cmc"),
+                color = row.getArrayOfStrings("colors").toList(),
+                colorIdentity = row.getArrayOfStrings("colorIdentity").toList(),
+                type = row.getString("type"),
+                types = row.getArrayOfStrings("types").toList(),
+                subtypes = row.getArrayOfStrings("subTypes").toList(),
+                rarity = row.getString("rarity"),
+                set = row.getString("set"),
+                setName = row.getString("setName"),
+                text = row.getString("text"),
+                flavor = row.getString("flavor").option(),
+                artist = row.getString("artist"),
+                number = row.getString("number"),
+                power = row.getString("power").option(),
+                toughness = row.getString("toughness").option(),
+                imageUrl = row.getString("imageUrl").option(),
+                multiverseId = row.getString("multiverseId").option(),
+                legalities = row.getArrayOfStrings("legalities").toList().map { Legality.fromJsonMagicApi(Json.parse(it)) },
+                race = row.getString("race").option()
+            )
         }
     }
 

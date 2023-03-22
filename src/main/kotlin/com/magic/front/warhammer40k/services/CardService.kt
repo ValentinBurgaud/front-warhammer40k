@@ -3,6 +3,7 @@ package com.magic.front.warhammer40k.services
 import com.magic.front.warhammer40k.clients.MagicClient
 import com.magic.front.warhammer40k.model.Card
 import com.altima.lib.toolbox.common.AppErrors
+import com.altima.lib.toolbox.extensions.mapRight
 import io.vavr.control.Either
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono

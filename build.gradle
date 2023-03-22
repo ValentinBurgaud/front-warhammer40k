@@ -28,6 +28,7 @@ dependencies {
 
     implementation 'org.flywaydb:flyway-core:9.16.0'
     implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'io.vertx:vertx-pg-client:4.4.0'
 
     implementation 'io.vavr:vavr-kotlin:0.10.2'
     implementation 'io.vavr:vavr:0.10.0'
