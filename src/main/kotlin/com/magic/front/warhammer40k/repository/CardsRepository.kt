@@ -8,16 +8,16 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 
 @Repository
-class Cards(private val jdbcClient: PgPool) {
+class CardsRepository(private val jdbcClient: PgPool) {
 
-    fun getCardById(actId: String): Mono<List<Card>> {
+    fun getCardById(cardId: String): Mono<List<Card>> {
         val query =
             """
                 SELECT * FROM CARD
                 WHERE id = $1
             """
 
-        return jdbcClient.preparedReactiveQuery(query, Tuple.of(actId)) { result ->
+        return jdbcClient.preparedReactiveQuery(query, Tuple.of(cardId)) { result ->
             result.map { row ->
                 Card.fromBdd(row)
             }

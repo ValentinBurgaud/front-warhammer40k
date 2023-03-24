@@ -27,7 +27,60 @@ class CardHandler(
                 either.fold(
                     { errors ->
                         when (errors.errors[0].message) {
-                            "node.not.found" -> notFound("Proposal with the specified id or version was not found")
+                            "card.not.found" -> notFound("card with the specified id was not found")
+                            else -> internalServerError()
+                        }
+                    },
+                    { cards ->
+                        ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(
+                                cards.toJson().stringify()
+                            )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling magic Api", it)
+                internalServerError()
+            }
+    }
+
+    fun listCardBdd(request: ServerRequest): Mono<ServerResponse> {
+        logger.info("Listing Magic cards from bdd")
+
+        return cardService.listCardBdd()
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "empty.response" -> notFound("cards in bdd was empty")
+                            else -> internalServerError()
+                        }
+                    },
+                    { cards ->
+                        ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(
+                                cards.toJson().stringify()
+                            )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling magic Api", it)
+                internalServerError()
+            }
+    }
+
+    fun listCardBothSource(request: ServerRequest): Mono<ServerResponse> {
+        logger.info("Listing Magic cards from bdd")
+
+        return cardService.getAllCardsCombinated()
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "card.not.found" -> notFound("card with the specified id was not found")
+                            "empty.response" -> notFound("cards in bdd was empty")
                             else -> internalServerError()
                         }
                     },
@@ -55,7 +108,35 @@ class CardHandler(
                 either.fold(
                     { errors ->
                         when (errors.errors[0].message) {
-                            "node.not.found" -> notFound("Proposal with the specified id or version was not found")
+                            "card.not.found" -> notFound("card with the specified id was not found")
+                            else -> internalServerError()
+                        }
+                    },
+                    { card ->
+                        ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(
+                                card.toJson().stringify()
+                            )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling magic Api", it)
+                internalServerError()
+            }
+    }
+
+    fun getCardBddById(request: ServerRequest): Mono<ServerResponse> {
+        val cardId = request.pathVariable("cardId")
+        logger.info("Listing Magic cards for Warhammer40k")
+
+        return cardValidator.checkCardId(cardId)
+            .flatMapEither { cardId -> cardService.getCardByIdBdd(cardId) }
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "card.not.found" -> notFound("card with the specified id was not found")
                             else -> internalServerError()
                         }
                     },
