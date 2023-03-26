@@ -66,7 +66,7 @@ class CardHandler(
                     })
             }
             .onErrorOrEmptyResume {
-                logger.error("an error occurred while calling magic Api", it)
+                logger.error("an error occurred while calling database", it)
                 internalServerError()
             }
     }
@@ -149,7 +149,7 @@ class CardHandler(
                     })
             }
             .onErrorOrEmptyResume {
-                logger.error("an error occurred while calling magic Api", it)
+                logger.error("an error occurred while calling database", it)
                 internalServerError()
             }
     }

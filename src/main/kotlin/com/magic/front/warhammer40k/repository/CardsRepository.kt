@@ -3,7 +3,7 @@ package com.magic.front.warhammer40k.repository
 import com.altima.lib.toolbox.extensions.preparedReactiveQuery
 import com.magic.front.warhammer40k.model.Card
 import io.vertx.pgclient.PgPool
-import io.vertx.sqlclient.Tuple
+import io.vertx.sqlclient.*
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 
@@ -29,7 +29,7 @@ class CardsRepository(private val jdbcClient: PgPool) {
 
     fun listCards(): Mono<List<Card>> {
         val query = """
-                SELECT * FROM CARD
+                SELECT * FROM card
             """
         return jdbcClient.preparedReactiveQuery(query) { result ->
             result.map { row ->
@@ -38,5 +38,3 @@ class CardsRepository(private val jdbcClient: PgPool) {
         }
     }
 }
-
-
