@@ -1,5 +1,6 @@
 package com.magic.front.warhammer40k.model
 
+import com.altima.lib.toolbox.json.*
 import io.vavr.control.Option
 import io.vavr.kotlin.option
 import io.vavr.kotlin.toVavrList
@@ -9,6 +10,7 @@ import org.reactivecouchbase.json.JsValue
 import org.reactivecouchbase.json.Json
 import org.reactivecouchbase.json.Syntax.`$`
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 data class Card(
@@ -35,7 +37,84 @@ data class Card(
     val legalities: List<Legality>,
     val race: Option<String>
 ) {
+
+    data class Builder(
+        var id: UUID = UUID.randomUUID(),
+        var name: String = "",
+        var manaCost: String = "",
+        var cmc: BigDecimal = BigDecimal.ONE,
+        var color: List<String> = emptyList(),
+        var colorIdentity: List<String> = emptyList(),
+        var type: String = "",
+        var types: List<String> = emptyList(),
+        var subtypes: List<String> = emptyList(),
+        var rarity: String = "",
+        var set: String = "",
+        var setName: String = "",
+        var text: String = "",
+        var flavor: Option<String> = Option.none(),
+        var artist: String = "",
+        var number: String = "",
+        var power: Option<String> = Option.none(),
+        var toughness: Option<String> = Option.none(),
+        var imageUrl: Option<String> = Option.none(),
+        var multiverseId: Option<String> = Option.none(),
+        var legalities: List<Legality> = emptyList(),
+        var race: Option<String> = Option.none()
+    ) {
+        fun id(id: UUID) = apply { this.id = id }
+        fun name(name: String) = apply { this.name = name }
+        fun manaCost(manaCost: String) = apply { this.manaCost = manaCost }
+        fun cmc(id: BigDecimal) = apply { this.cmc = cmc }
+        fun color(color: List<String>) = apply { this.color = color }
+        fun colorIdentity(colorIdentity: List<String>) = apply { this.colorIdentity = colorIdentity }
+        fun type(type: String) = apply { this.type = type }
+        fun types(types: List<String>) = apply { this.types = types }
+        fun subtypes(id: List<String>) = apply { this.subtypes = subtypes }
+        fun rarity(rarity: String) = apply { this.rarity = rarity }
+        fun set(set: String) = apply { this.set = set }
+        fun setName(setName: String) = apply { this.setName = setName }
+        fun text(text: String) = apply { this.text = text }
+        fun flavor(flavor: Option<String>) = apply { this.flavor = flavor }
+        fun artist(artist: String) = apply { this.artist = artist }
+        fun number(number: String) = apply { this.number = number }
+        fun power(power: Option<String>) = apply { this.power = power }
+        fun toughness(toughness: Option<String>) = apply { this.toughness = toughness }
+        fun imageUrl(imageUrl: Option<String>) = apply { this.imageUrl = imageUrl }
+        fun multiverseId(multiverseId: Option<String>) = apply { this.multiverseId = multiverseId }
+        fun legalities(legalities: List<Legality>) = apply { this.legalities = legalities }
+        fun race(race: Option<String>) = apply { this.race = race }
+        fun build() = Card(id, name, manaCost, cmc, color, colorIdentity, type, types, subtypes, rarity, set, setName, text, flavor, artist, number, power, toughness, imageUrl, multiverseId, legalities, race)
+    }
     companion object {
+
+        val format: JsonFormat<Card> = JsonFormat.of(
+            _string("name") { name -> Builder().name(name) }
+                .and(_string("manaCost")) { b, manaCost -> b.manaCost(manaCost) }
+                .and(_field("cmc", _bigDecimal(10))) { b, cmc -> b.cmc(cmc) }
+                .and(_list("color", _string())) { b, color -> b.color(color.asJava()) }
+                .and(_list("colorIdentity", _string())) { b, colorIdentity -> b.colorIdentity(colorIdentity.asJava()) }
+                .and(_string("type")) { b, type -> b.type(type) }
+                .and(_list("types", _string())) { b, types -> b.types(types.asJava()) }
+                .and(_list("subtypes", _string())) { b, subtypes -> b.subtypes(subtypes.asJava()) }
+                .and(_string("rarity")) { b, rarity -> b.rarity(rarity) }
+                .and(_string("set")) { b, set -> b.set(set) }
+                .and(_string("setName")) { b, setName -> b.setName(setName) }
+                .and(_string("text")) { b, text -> b.set(text) }
+                .and(_opt("flavor", _string())) { b, flavor -> b.flavor(flavor) }
+                .and(_string("artist")) { b, artist -> b.artist(artist) }
+                .and(_string("number")) { b, number -> b.number(number) }
+                .and(_opt("power", _string())) { b, power -> b.power(power) }
+                .and(_opt("toughness", _string())) { b, toughness -> b.toughness(toughness) }
+                .and(_opt("imageUrl", _string())) { b, imageUrl -> b.imageUrl(imageUrl) }
+                .and(_opt("multiverseId", _string())) { b, multiverseId -> b.multiverseId(multiverseId) }
+                .and(_list("legalities", Legality.format.reader)) { b, legalities -> b.legalities(legalities.asJava()) }
+                .and(_opt("race", _string())) { b, race -> b.race(race) }
+                .map { it.build() }
+        ) { card ->
+            card.toJson()
+        }
+
         fun fromJsonMagicApi(json: JsValue): Card {
             return Card(
                 id = UUID.fromString(json.field("id").asString()),
@@ -144,7 +223,24 @@ data class Legality(
     val format: String,
     val legality: String
 ) {
+
+    data class Builder(
+        var format: String = "",
+        var legality: String = "",
+    ) {
+        fun format(format: String) = apply { this.format = format }
+        fun legality(legality: String) = apply { this.legality = legality }
+        fun build() = Legality(format, legality)
+    }
     companion object {
+
+        val format: JsonFormat<Legality> = JsonFormat.of(
+            _string("format") { format -> Builder().format(format) }
+                .and(_string("legality")) { b, legality -> b.legality(legality) }
+                .map { it.build() }
+        ) { legality ->
+            legality.toJson()
+        }
         fun fromJsonMagicApi(json: JsValue): Legality {
             return Legality(
                 format = json.string("format"),
