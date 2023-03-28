@@ -7,6 +7,7 @@ import com.altima.lib.toolbox.errors.internalServerError
 import com.altima.lib.toolbox.errors.notFound
 import com.altima.lib.toolbox.extensions.*
 import com.magic.front.warhammer40k.model.Card
+import com.magic.front.warhammer40k.parsers.patch.Patches
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -186,13 +187,44 @@ class CardHandler(
     fun deleteCard(request: ServerRequest): Mono<ServerResponse> {
         val cardId = request.pathVariable("cardId")
         logger.info("Deleted card on database")
-        
+
         return cardService.deleteCard(cardId)
             .flatMap {
                 ServerResponse.noContent().build()
             }.onErrorOrEmptyResume {
                 logger.error("an error occurred while deleted card", it)
                 ServerResponse.status(500).build()
+            }
+    }
+
+    fun updateCard(request: ServerRequest): Mono<ServerResponse> {
+        logger.info("update card in database")
+        val cardId = request.pathVariable("cardId")
+
+        //TODO validator on data
+        return request.readBodyUsing(Patches.format.reader)
+            .flatMapEither { patches -> cardValidator.checkCardId(cardId).mapRight { Pair(patches, it) } }
+            .flatMapEither {(patches, id) -> cardValidator.validateCardPatch(patches, id).mapRight { it.second } }
+            .flatMapEither { card -> cardService.updateCard(card) }
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "card.not.found" -> notFound("card with the specified id was not found")
+                            else -> internalServerError()
+                        }
+                    },
+                    { card ->
+                        ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(
+                                card.toJson().stringify()
+                            )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling database", it)
+                internalServerError()
             }
     }
 }

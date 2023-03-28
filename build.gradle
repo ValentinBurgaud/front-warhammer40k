@@ -25,6 +25,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+    implementation 'com.github.java-json-tools:json-patch:1.13'
 
     implementation 'org.flywaydb:flyway-core:9.16.0'
     implementation 'org.postgresql:postgresql:42.5.1'

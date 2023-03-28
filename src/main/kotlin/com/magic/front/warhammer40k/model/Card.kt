@@ -11,6 +11,7 @@ import org.reactivecouchbase.json.Json
 import org.reactivecouchbase.json.Syntax.`$`
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 data class Card(
@@ -113,6 +114,32 @@ data class Card(
                 .map { it.build() }
         ) { card ->
             card.toJson()
+        }
+
+        fun asRequest(card: Card): JsValue {
+            return Json.obj(
+                `$`("name", card.name),
+                `$`("manaCost", card.manaCost),
+                `$`("cmc", card.cmc),
+                `$`("color", Json.array(card.color.toVavrList())),
+                `$`("colorIdentity", Json.array(card.colorIdentity.toVavrList())),
+                `$`("type", card.type),
+                `$`("types", Json.array(card.types.toVavrList())),
+                `$`("subtypes", Json.array(card.subtypes.toVavrList())),
+                `$`("rarity", card.rarity),
+                `$`("set", card.set),
+                `$`("setName", card.setName),
+                `$`("text", card.text),
+                `$`("flavor", card.flavor),
+                `$`("artist", card.artist),
+                `$`("number", card.number),
+                `$`("power", card.power),
+                `$`("toughness", card.toughness),
+                `$`("imageUrl", card.imageUrl),
+                `$`("multiverseId", card.multiverseId),
+                `$`("legalities", Json.array(card.legalities.toVavrList())),
+                `$`("race", card.race)
+            )
         }
 
         fun fromJsonMagicApi(json: JsValue): Card {
