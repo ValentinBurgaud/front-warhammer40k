@@ -38,6 +38,7 @@ internal class RouterConfig {
                     "/{cardId}".nest {
                         GET("", cardHandler::getCardBddById)
                         DELETE("", cardHandler::deleteCard)
+                        PATCH("", cardHandler::updateCard)
                     }
                     POST("", cardHandler::createCard)
                 }

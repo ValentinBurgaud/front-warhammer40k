@@ -31,8 +31,8 @@ data class Card(
     val flavor: Option<String>,
     val artist: String,
     val number: String,
-    val power: Option<String>,
-    val toughness: Option<String>,
+    val power: Option<Int>,
+    val toughness: Option<Int>,
     val imageUrl: Option<String>,
     val multiverseId: Option<String>,
     val legalities: List<Legality>,
@@ -56,8 +56,8 @@ data class Card(
         var flavor: Option<String> = Option.none(),
         var artist: String = "",
         var number: String = "",
-        var power: Option<String> = Option.none(),
-        var toughness: Option<String> = Option.none(),
+        var power: Option<Int> = Option.none(),
+        var toughness: Option<Int> = Option.none(),
         var imageUrl: Option<String> = Option.none(),
         var multiverseId: Option<String> = Option.none(),
         var legalities: List<Legality> = emptyList(),
@@ -79,8 +79,8 @@ data class Card(
         fun flavor(flavor: Option<String>) = apply { this.flavor = flavor }
         fun artist(artist: String) = apply { this.artist = artist }
         fun number(number: String) = apply { this.number = number }
-        fun power(power: Option<String>) = apply { this.power = power }
-        fun toughness(toughness: Option<String>) = apply { this.toughness = toughness }
+        fun power(power: Option<Int>) = apply { this.power = power }
+        fun toughness(toughness: Option<Int>) = apply { this.toughness = toughness }
         fun imageUrl(imageUrl: Option<String>) = apply { this.imageUrl = imageUrl }
         fun multiverseId(multiverseId: Option<String>) = apply { this.multiverseId = multiverseId }
         fun legalities(legalities: List<Legality>) = apply { this.legalities = legalities }
@@ -105,8 +105,8 @@ data class Card(
                 .and(_opt("flavor", _string())) { b, flavor -> b.flavor(flavor) }
                 .and(_string("artist")) { b, artist -> b.artist(artist) }
                 .and(_string("number")) { b, number -> b.number(number) }
-                .and(_opt("power", _string())) { b, power -> b.power(power) }
-                .and(_opt("toughness", _string())) { b, toughness -> b.toughness(toughness) }
+                .and(_opt("power", _int())) { b, power -> b.power(power) }
+                .and(_opt("toughness", _int())) { b, toughness -> b.toughness(toughness) }
                 .and(_opt("imageUrl", _string())) { b, imageUrl -> b.imageUrl(imageUrl) }
                 .and(_opt("multiverseId", _string())) { b, multiverseId -> b.multiverseId(multiverseId) }
                 .and(_list("legalities", Legality.format.reader)) { b, legalities -> b.legalities(legalities.asJava()) }
@@ -160,8 +160,8 @@ data class Card(
                 flavor = json.field("flavor").asOptString(),
                 artist = json.string("artist"),
                 number = json.string("number"),
-                power = json.field("power").asOptString(),
-                toughness = json.field("toughness").asOptString(),
+                power = json.field("power").asOptString().map { it.toInt() },
+                toughness = json.field("toughness").asOptString().map { it.toInt() },
                 imageUrl = json.field("imageUrl").asOptString(),
                 multiverseId = json.field("multiverseId").asOptString(),
                 legalities = json.array("legalities").toList().map { Legality.fromJsonMagicApi(it) },
@@ -208,8 +208,8 @@ data class Card(
                 flavor = row.getString("flavor").option(),
                 artist = row.getString("artist"),
                 number = row.getInteger("number").toString(),
-                power = row.getInteger("power").toString().option(),
-                toughness = row.getInteger("toughness").toString().option(),
+                power = row.getInteger("power").option(),
+                toughness = row.getInteger("toughness").option(),
                 imageUrl = row.getString("image_url").option(),
                 multiverseId = row.getString("multiverse_id").option(),
                 legalities = emptyList(),

@@ -14,6 +14,7 @@ import com.magic.front.warhammer40k.parsers.patch.Patches
 import com.magic.front.warhammer40k.services.CardService
 import io.vavr.control.Either
 import io.vavr.control.Option
+import io.vavr.kotlin.Try
 import io.vavr.kotlin.option
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -85,11 +86,17 @@ class CardValidator(
 
     val Card.vAll: Rule<AppError>
         get() = Rule.combine(
-            vName
+            vName,
+            vRace
         )
 
     val Card.vName: Rule<AppError>
-        get() = Rule.invalidWhen(AppError.error(Option.some("id"), "invalid.body")) {
+        get() = Rule.invalidWhen(AppError.error(Option.some("name"), "invalid.body")) {
             name.isEmpty()
+        }
+
+    val Card.vRace: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("race"), "invalid.body")) {
+            race.isDefined
         }
 }

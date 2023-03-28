@@ -201,10 +201,9 @@ class CardHandler(
         logger.info("update card in database")
         val cardId = request.pathVariable("cardId")
 
-        //TODO validator on data
         return request.readBodyUsing(Patches.format.reader)
             .flatMapEither { patches -> cardValidator.checkCardId(cardId).mapRight { Pair(patches, it) } }
-            .flatMapEither {(patches, id) -> cardValidator.validateCardPatch(patches, id).mapRight { it.second } }
+            .flatMapEither { (patches, id) -> cardValidator.validateCardPatch(patches, id).mapRight { it.second } }
             .flatMapEither { card -> cardService.updateCard(card) }
             .flatMap { either ->
                 either.fold(
