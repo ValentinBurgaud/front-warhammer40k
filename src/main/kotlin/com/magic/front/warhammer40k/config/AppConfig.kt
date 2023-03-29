@@ -1,5 +1,6 @@
 package com.magic.front.warhammer40k.config
 
+import com.magic.front.warhammer40k.clients.CacheClient
 import com.magic.front.warhammer40k.clients.MagicClient
 import com.magic.front.warhammer40k.config.domain.Env
 import io.vertx.core.Vertx
@@ -20,6 +21,11 @@ class AppConfig(private val env: Env) {
     @Bean
     fun verticle(): Vertx {
         return Vertx.vertx()
+    }
+
+    @Bean
+    fun cache(): CacheClient {
+        return CacheClient(env.cacheConfig)
     }
 
     @Bean

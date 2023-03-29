@@ -8,6 +8,7 @@ import com.altima.lib.toolbox.extensions.logger
 import com.altima.lib.toolbox.extensions.mapRight
 import com.altima.lib.toolbox.extensions.measure
 import io.vavr.control.Either
+import org.reactivecouchbase.json.JsArray
 import org.reactivecouchbase.json.Json
 import org.springframework.http.MediaType
 import org.springframework.web.util.UriComponents
@@ -48,6 +49,18 @@ class MagicClient(private val apiConfig: ApiKeyConfig) {
         }.switchIfEmpty(
             Either.right<AppErrors, List<Card>>(emptyList()).toMono()
         )
+    }
+
+    fun listCardsWarhammerToCache(): Mono<JsArray> {
+        val uri = UriComponentsBuilder.newInstance()
+            .pathSegment("v1", "cards")
+            .queryParam("set", "40K")
+            .build()
+        return magicCall(uri) { client ->
+            client.get()
+        }.map { response ->
+            Json.parse(response).asArray()
+        }
     }
 
     private fun magicCall(

@@ -1,8 +1,6 @@
 package com.magic.front.warhammer40k.config
 
-import com.magic.front.warhammer40k.config.domain.Env
-import com.magic.front.warhammer40k.config.domain.apiKeyConfigBuilder
-import com.magic.front.warhammer40k.config.domain.dataSourceConfigBuilder
+import com.magic.front.warhammer40k.config.domain.*
 import com.magic.front.warhammer40k.config.domain.envBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -36,6 +34,12 @@ class EnvConfig(
                     username("warhammer40k")
                     password("warhammer40k")
                     maximumPoolSize(10)
+                }
+            )
+            cacheConfig(
+                cacheConfigBuilder {
+                    ttl(15)
+                    heap(20)
                 }
             )
         }
