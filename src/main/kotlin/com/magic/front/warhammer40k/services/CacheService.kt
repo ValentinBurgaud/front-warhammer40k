@@ -1,9 +1,11 @@
 package com.magic.front.warhammer40k.services
 
 import com.altima.lib.toolbox.extensions.logger
+import com.altima.lib.toolbox.extensions.mapLeftEither
 import com.altima.lib.toolbox.extensions.mapRight
 import com.magic.front.warhammer40k.clients.CacheClient
 import com.magic.front.warhammer40k.clients.MagicClient
+import io.vavr.control.Either
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
@@ -16,7 +18,9 @@ class CacheService(
         logger.info("caching cards")
         //TODO Improve retry condition
         return magicClient.listCardsWarhammer()
-            .retry().mapRight { cards ->
+            .retry()
+            .mapLeftEither { error -> Either.right(emptyList()) }
+            .mapRight { cards ->
             cacheClient.cardsCache.put(
                 "cards",
                 cards
