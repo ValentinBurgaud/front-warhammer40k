@@ -51,18 +51,6 @@ class MagicClient(private val apiConfig: ApiKeyConfig) {
         )
     }
 
-    fun listCardsWarhammerToCache(): Mono<JsArray> {
-        val uri = UriComponentsBuilder.newInstance()
-            .pathSegment("v1", "cards")
-            .queryParam("set", "40K")
-            .build()
-        return magicCall(uri) { client ->
-            client.get()
-        }.map { response ->
-            Json.parse(response).asArray()
-        }
-    }
-
     private fun magicCall(
         uriComponents: UriComponents,
         use: (HttpClient) -> HttpClient.ResponseReceiver<*>

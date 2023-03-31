@@ -5,6 +5,7 @@ import com.magic.front.warhammer40k.model.Card
 import com.altima.lib.toolbox.common.AppErrors
 import com.altima.lib.toolbox.extensions.mapEither
 import com.altima.lib.toolbox.extensions.mapRight
+import com.magic.front.warhammer40k.clients.CardsCache
 import com.magic.front.warhammer40k.repository.CardsRepository
 import io.vavr.control.Either
 import io.vavr.control.Option
@@ -12,6 +13,7 @@ import io.vavr.kotlin.option
 import io.vavr.kotlin.toVavrList
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 
 @Service
 class CardService(
@@ -20,6 +22,11 @@ class CardService(
 ) {
     fun listCardWarhammer40KMagicApi(): Mono<Either<AppErrors, List<Card>>> {
         return magicClient.listCardsWarhammer()
+    }
+
+    fun listCardWarhammer40KMagicApiWithCache(): Mono<Either<AppErrors, List<Card>>> {
+        val cacheCards = CardsCache.values.map { it.value as List<Card>}.flatten()
+        return Option.`when`(cacheCards.isNotEmpty()) { cacheCards }.toEither(AppErrors.error("empty.response")).toMono()
     }
 
     fun listCardBdd(): Mono<Either<AppErrors, List<Card>>> {
