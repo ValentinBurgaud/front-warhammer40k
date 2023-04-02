@@ -101,7 +101,7 @@ data class Card(
                 .and(_string("rarity")) { b, rarity -> b.rarity(rarity) }
                 .and(_string("set")) { b, set -> b.set(set) }
                 .and(_string("setName")) { b, setName -> b.setName(setName) }
-                .and(_string("text")) { b, text -> b.set(text) }
+                .and(_string("text")) { b, text -> b.text(text) }
                 .and(_opt("flavor", _string())) { b, flavor -> b.flavor(flavor) }
                 .and(_string("artist")) { b, artist -> b.artist(artist) }
                 .and(_string("number")) { b, number -> b.number(number) }

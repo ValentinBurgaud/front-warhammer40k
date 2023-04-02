@@ -2,8 +2,11 @@ package com.magic.front.warhammer40k.repository
 
 import com.altima.lib.toolbox.extensions.preparedReactiveQuery
 import com.magic.front.warhammer40k.model.Card
+import io.vavr.kotlin.toVavrList
+import io.vertx.core.json.JsonArray
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.*
+import org.reactivecouchbase.json.Json
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 
@@ -47,24 +50,29 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.name,
             card.manaCost,
             card.cmc,
-            card.color,
-            card.colorIdentity,
+            //TODO Convertion problems
+//            JsonArray(Json.arr(card.color.map { it.uppercase() }.toVavrList()).stringify()),
+            arrayOf("ARRAY ['W', 'B', 'M']"),
+//            card.colorIdentity,
+            arrayOf("ARRAY ['W', 'B', 'M']"),
             card.type,
-            card.types,
-            card.subtypes,
+//            card.types,
+            arrayOf("ARRAY ['Créatures']"),
+//            card.subtypes,
+            arrayOf("ARRAY []"),
             card.rarity,
             card.set,
             card.setName,
             card.text,
-            card.flavor,
+            card.flavor.orNull,
             card.artist,
-            card.number,
-            card.power,
-            card.toughness,
-            card.imageUrl,
-            card.multiverseId,
-            card.legalities,
-            card.race
+            card.number.toInt(),
+            card.power.getOrElse(0),
+            card.toughness.getOrElse(0),
+            card.imageUrl.getOrElse("A ajouter plus tard"),
+            card.multiverseId.orNull,
+            card.legalities.firstOrNull(),
+            card.race.getOrElse("")
         )
         return jdbcClient.preparedReactiveQuery(query, tuple) {}
     }
