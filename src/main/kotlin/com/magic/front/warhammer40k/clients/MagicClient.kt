@@ -2,11 +2,11 @@ package com.magic.front.warhammer40k.clients
 
 import com.magic.front.warhammer40k.config.domain.ApiKeyConfig
 import com.magic.front.warhammer40k.model.Card
-import com.altima.lib.toolbox.common.AppErrors
-import com.altima.lib.toolbox.extensions.logCall
-import com.altima.lib.toolbox.extensions.logger
-import com.altima.lib.toolbox.extensions.mapRight
-import com.altima.lib.toolbox.extensions.measure
+import com.custom.lib.toolbox.common.AppErrors
+import com.custom.lib.toolbox.extensions.logCall
+import com.custom.lib.toolbox.extensions.logger
+import com.custom.lib.toolbox.extensions.mapRight
+import com.custom.lib.toolbox.extensions.measure
 import io.vavr.control.Either
 import org.reactivecouchbase.json.JsArray
 import org.reactivecouchbase.json.Json

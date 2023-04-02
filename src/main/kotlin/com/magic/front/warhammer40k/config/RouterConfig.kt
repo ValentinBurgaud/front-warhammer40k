@@ -1,7 +1,7 @@
 package com.magic.front.warhammer40k.config
 
 import com.magic.front.warhammer40k.handlers.CardHandler
-import com.altima.lib.toolbox.extensions.mesure
+import com.custom.lib.toolbox.extensions.mesure
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource

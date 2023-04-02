@@ -1,12 +1,12 @@
 package com.magic.front.warhammer40k.validators
 
-import com.altima.lib.toolbox.common.AppError
-import com.altima.lib.toolbox.common.AppErrors
-import com.altima.lib.toolbox.extensions.isUUID
-import com.altima.lib.toolbox.extensions.mapEither
-import com.altima.lib.toolbox.json.JsonExt
-import com.altima.lib.toolbox.json.JsonFormat
-import com.altima.lib.toolbox.validations.Rule
+import com.custom.lib.toolbox.common.AppError
+import com.custom.lib.toolbox.common.AppErrors
+import com.custom.lib.toolbox.extensions.isUUID
+import com.custom.lib.toolbox.extensions.mapEither
+import com.custom.lib.toolbox.json.JsonExt
+import com.custom.lib.toolbox.json.JsonFormat
+import com.custom.lib.toolbox.validations.Rule
 import com.magic.front.warhammer40k.common.JsonPatch
 import com.magic.front.warhammer40k.model.Card
 import com.magic.front.warhammer40k.parsers.patch.PatchOp

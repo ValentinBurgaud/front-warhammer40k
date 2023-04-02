@@ -3,9 +3,9 @@ package com.magic.front.warhammer40k.handlers
 import com.magic.front.warhammer40k.model.Card.Companion.toJson
 import com.magic.front.warhammer40k.services.CardService
 import com.magic.front.warhammer40k.validators.CardValidator
-import com.altima.lib.toolbox.errors.internalServerError
-import com.altima.lib.toolbox.errors.notFound
-import com.altima.lib.toolbox.extensions.*
+import com.custom.lib.toolbox.errors.internalServerError
+import com.custom.lib.toolbox.errors.notFound
+import com.custom.lib.toolbox.extensions.*
 import com.magic.front.warhammer40k.model.Card
 import com.magic.front.warhammer40k.parsers.patch.Patches
 import org.springframework.http.MediaType

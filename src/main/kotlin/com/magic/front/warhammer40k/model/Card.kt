@@ -1,6 +1,6 @@
 package com.magic.front.warhammer40k.model
 
-import com.altima.lib.toolbox.json.*
+import com.custom.lib.toolbox.json.*
 import io.vavr.control.Option
 import io.vavr.kotlin.option
 import io.vavr.kotlin.toVavrList

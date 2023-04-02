@@ -1,12 +1,9 @@
 package com.magic.front.warhammer40k.repository
 
-import com.altima.lib.toolbox.extensions.preparedReactiveQuery
+import com.custom.lib.toolbox.extensions.preparedReactiveQuery
 import com.magic.front.warhammer40k.model.Card
-import io.vavr.kotlin.toVavrList
-import io.vertx.core.json.JsonArray
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.*
-import org.reactivecouchbase.json.Json
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 

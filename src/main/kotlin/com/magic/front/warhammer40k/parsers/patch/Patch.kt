@@ -1,14 +1,14 @@
 package com.magic.front.warhammer40k.parsers.patch
 
-import com.altima.lib.toolbox.json.JsonFormat
-import com.altima.lib.toolbox.json._enum
-import com.altima.lib.toolbox.json._field
-import com.altima.lib.toolbox.json._jsValue
-import com.altima.lib.toolbox.json._list
-import com.altima.lib.toolbox.json._opt
-import com.altima.lib.toolbox.json._string
-import com.altima.lib.toolbox.json.and
-import com.altima.lib.toolbox.json.map
+import com.custom.lib.toolbox.json.JsonFormat
+import com.custom.lib.toolbox.json._enum
+import com.custom.lib.toolbox.json._field
+import com.custom.lib.toolbox.json._jsValue
+import com.custom.lib.toolbox.json._list
+import com.custom.lib.toolbox.json._opt
+import com.custom.lib.toolbox.json._string
+import com.custom.lib.toolbox.json.and
+import com.custom.lib.toolbox.json.map
 import io.vavr.control.Option
 import io.vavr.kotlin.toVavrList
 import org.reactivecouchbase.json.JsValue
