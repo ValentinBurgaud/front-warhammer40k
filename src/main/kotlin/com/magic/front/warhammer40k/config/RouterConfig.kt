@@ -32,6 +32,22 @@ internal class RouterConfig {
                     GET("", cardHandler::getCardWarhammer40kById)
                 }
             }
+            "/api/v1/bdd/cards".nest {
+                "".nest {
+                    GET("", cardHandler::listCardBdd)
+                    "/{cardId}".nest {
+                        GET("", cardHandler::getCardBddById)
+                        DELETE("", cardHandler::deleteCard)
+                        PATCH("", cardHandler::updateCard)
+                    }
+                    POST("", cardHandler::createCard)
+                }
+            }
+            "/api/v1/both/cards".nest {
+                "".nest {
+                    GET("", cardHandler::listCardBothSource)
+                }
+            }
         }.mesure()
     }
 }

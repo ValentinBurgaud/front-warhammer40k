@@ -1,0 +1,401 @@
+openapi: 3.0.2
+info:
+  version: v1
+  title: Warhammer40k
+  description: API de gestion des cartes magic Warhammer40k
+  contact:
+    name: Valentin
+    email: valentin.burgaud2@gmail.com
+servers:
+  - url: 'https://localhost:8080'
+paths:
+  /openapi/api.yaml:
+    get:
+      operationId: get-api-spec
+      description: Télécharger la spec Open API
+      responses:
+        '200':
+          description: OK.
+        '401':
+          description: Authorization information is missing or invalid.
+      security:
+        - appId: []
+          apiKey: []
+  /api/v1/cards:
+    get:
+      tags:
+        - cards
+      description: Liste les cartes via l'api Magic
+      operationId: get-cards
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '401':
+          description: Authorization information is missing or invalid.
+      summary: Lister les cartes via l'api Magic
+  /api/v1/cards/{cardId}:
+    parameters:
+      - schema:
+          type: string
+        name: cardId
+        in: path
+        required: true
+    get:
+      tags:
+        - cards
+      description: recherche la carte avec l'id passer via l'api Magic
+      operationId: get-cards-by-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: Card with the specified id was not found.
+      summary: Rechercher une carte via l'api Magic
+  /api/v1/bdd/cards:
+    get:
+      tags:
+        - cards
+      description: Liste les cartes via la base de donnée
+      operationId: get-cards-bdd
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '401':
+          description: Authorization information is missing or invalid.
+      summary: Lister les cartes via la base de donnée
+    post:
+      tags:
+        - cards
+      description: Ajouter une carte dans la base de donnée
+      operationId: post-cards-bdd
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '401':
+          description: Authorization information is missing or invalid.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/card'
+      summary: Lister les cartes via la base de donnée
+  /api/v1/bdd/cards/{cardId}:
+    parameters:
+      - schema:
+          type: string
+        name: cardId
+        in: path
+        required: true
+    get:
+      tags:
+        - cards
+      description: recherche la carte avec l'id passer via la base de donnée
+      operationId: get-cards-by-id-bdd
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: Card with the specified id was not found.
+      summary: Rechercher une carte via la base de donnée
+    delete:
+      tags:
+        - cards
+      description: Supprimer la carte
+      operationId: delete-cards-by-id-bdd
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: Card with the specified id was not found.
+      summary: Supprimer une carte via la base de donnée
+    patch:
+      summary: Modifier une carte
+      operationId: patch-cards-by-id-bdd
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: Contract or document with the specified ids were not found.
+      description: |
+        Cette API utlise le format JSON Patch spécifié dans la [RFC 6902](http://tools.ietf.org/html/rfc6902).
+        
+        JSON Patch est un format permettant de décrire les modifications apportées à un document JSON, en l'occurrence la personne. Ce format peut être utilisé pour éviter d'envoyer un document entier lorsqu'une partie seulement a été modifiée. Dans notre cas il est utilisé en combinaison avec la méthode HTTP PATCH,
+        et il permet des mises à jour partielles de la personne d'une manière conforme aux normes.
+        
+        Les opérations patchs sont eux-mêmes des documents JSON.
+        
+        ## Exemple
+        ### Le document JSON original
+        ```
+        {
+          "baz": "qux",
+          "foo": "bar"
+        }
+        ```
+        ### Le patch
+        ```
+        [
+          { "op": "replace", "path": "/baz", "value": "boo" },
+          { "op": "add", "path": "/hello", "value": "world" },
+          { "op": "remove", "path": "/foo" }
+        ]
+        ```
+        ### Le résultat
+        ```
+        {
+          "baz": "boo",
+          "hello": "world"
+        }
+        ```
+      tags:
+        - cards
+      security:
+        - appId: [ ]
+          apiKey: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Content-Type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/UpdateEvidence'
+components:
+  securitySchemes:
+    appId:
+      type: apiKey
+      in: header
+      name: X-Auth-App-Id
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-Auth-Key
+  schemas:
+    legality:
+      title: legality
+      description: "Format de l'objet legalité, utiliser pour savoir dans quel tournois cette carte peut-être utiliser"
+      type: object
+      properties:
+        format:
+          type: string
+          description: "Format du deck"
+        legality:
+          type: string
+          description: "Légalité de cette carte"
+    card:
+      title: card
+      description: "Métadonnées d'une carte"
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Id de la carte"
+        name:
+          type: string
+          description: "Nom de la carte"
+        manaCost:
+          type: string
+          description: "Coup en mana pour invoquer la carte avec couleur"
+        cmc:
+          type: number
+          description: "cout mana total"
+        color:
+          type: array
+          description: 'liste des couleurs de la carte (enum a venir)'
+          default: [ ]
+          items:
+            type: string
+        colorIdentity:
+          type: array
+          description: 'liste des couleurs de la carte (enum a venir)'
+          default: [ ]
+          items:
+            type: string
+        type:
+          type: string
+          description: 'Type de la créature'
+        types:
+          type: array
+          description: 'liste des types de la créature (enum a venir)'
+          default: [ ]
+          items:
+            type: string
+        subtypes:
+          type: array
+          description: 'liste des types de la créature (enum a venir)'
+          default: [ ]
+          items:
+            type: string
+        rarity:
+          type: string
+          description: 'Rareté de la créature'
+        set:
+          type: string
+          description: 'set auquel apartient la créature'
+        setName:
+          type: string
+          description: 'nom du set auquel apartient la créature'
+        text:
+          type: string
+          description: 'description des compétences de la créatures'
+        flavor:
+          type: string
+          description: "phrase d'accroche"
+        artist:
+          type: string
+          description: "phrase d'accroche"
+        number:
+          type: string
+          description: "numéro de la carte dans le deck"
+        power:
+          type: number
+          description: "Force de la carte"
+        toughness:
+          type: number
+          description: "Point de vie de la carte"
+        imageUrl:
+          type: string
+          description: "Url de l'image (devrait changer pour un autre format)"
+        multiverseId:
+          type: number
+          description: "Id de l'univers de la carte"
+        legalities:
+          type: array
+          description: 'liste des format de jeu dans lesquel cette carte est accepter'
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/legality'
+        race:
+          type: string
+          description: "Race de la carte"
+      required:
+        - name
+        - manaCost
+        - cmc
+        - color
+        - colorIdentity
+        - type
+        - types
+        - subtypes
+        - rarity
+        - set
+        - setName
+        - text
+        - artist
+        - number
+        - power
+        - toughness
+        - legalities
+    ErrorResponse:
+      title: ResponsError
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Chemin du champ en erreur
+        message:
+          type: string
+          description: Details de l'erreur
+        args:
+          type: array
+          description: Indications pour éviter l'erreur
+          items:
+            type: string
+    UpdateCard:
+      title: UpdateCard
+      type: object
+      properties:
+        path:
+          type: string
+          description: Chemin du champ à modifier
+        op:
+          type: string
+          description: Opération à effectuer (add; replace; remove)
+        value:
+          type: string
+          description: Nouvelle valeur
+      required:
+        - path
+        - op
+tags:
+  - name: cards
+    x-displayName: Le modèle card
+    description: |
+      <SchemaDefinition schemaRef="#/components/schemas/card"  showReadOnly={true} showWriteOnly={true}/>
+  - name: proposalDocument
+    x-displayName: Le modèle legality
+    description: |
+      <SchemaDefinition schemaRef="#/components/schemas/legality" showReadOnly={true} showWriteOnly={true} />
+  - name: errors
+    x-displayName: Le modèle Erreur
+    description: |
+      <SchemaDefinition schemaRef="#/components/schemas/ErrorResponse" exampleRef="#/components/examples/ErrorResponse" showReadOnly={true} showWriteOnly={true} />
+x-tagGroups:
+  - name: Carte
+    tags:
+      - cards
+  - name: Listes statiques
+    tags:
+      - Listes statiques
+  - name: Models
+    tags:
+      - cards
+      - legality
+      - errors
