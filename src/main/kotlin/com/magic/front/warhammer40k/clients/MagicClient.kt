@@ -8,6 +8,7 @@ import com.altima.lib.toolbox.extensions.logger
 import com.altima.lib.toolbox.extensions.mapRight
 import com.altima.lib.toolbox.extensions.measure
 import io.vavr.control.Either
+import org.reactivecouchbase.json.JsArray
 import org.reactivecouchbase.json.Json
 import org.springframework.http.MediaType
 import org.springframework.web.util.UriComponents

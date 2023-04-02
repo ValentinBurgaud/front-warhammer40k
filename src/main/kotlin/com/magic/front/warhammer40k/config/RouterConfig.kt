@@ -48,6 +48,11 @@ internal class RouterConfig {
                     GET("", cardHandler::listCardBothSource)
                 }
             }
+            "/api/v1/cache/cards".nest {
+                "".nest {
+                    GET("", cardHandler::listCardWithCache)
+                }
+            }
         }.mesure()
     }
 }

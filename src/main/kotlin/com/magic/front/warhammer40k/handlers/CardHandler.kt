@@ -71,6 +71,32 @@ class CardHandler(
             }
     }
 
+    fun listCardWithCache(request: ServerRequest): Mono<ServerResponse> {
+        logger.info("Listing Magic cards from cache")
+
+        return cardService.listCardWarhammer40KMagicApiWithCache()
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "empty.response" -> notFound("cards in bdd was empty")
+                            else -> internalServerError()
+                        }
+                    },
+                    { cards ->
+                        ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(
+                                cards.toJson().stringify()
+                            )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling database", it)
+                internalServerError()
+            }
+    }
+
     fun listCardBothSource(request: ServerRequest): Mono<ServerResponse> {
         logger.info("Listing Magic cards from bdd")
 

@@ -8,5 +8,7 @@ import org.springframework.boot.runApplication
 class Warhammer40kApplication
 
 fun main(args: Array<String>) {
-    runApplication<Warhammer40kApplication>(*args).getBean(StartUp::class.java).start()
+    runApplication<Warhammer40kApplication>(*args)
+        .getBean(StartUp::class.java)
+        .start()
 }
