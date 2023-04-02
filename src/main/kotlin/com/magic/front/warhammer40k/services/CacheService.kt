@@ -1,8 +1,8 @@
 package com.magic.front.warhammer40k.services
 
-import com.altima.lib.toolbox.extensions.logger
-import com.altima.lib.toolbox.extensions.mapLeftEither
-import com.altima.lib.toolbox.extensions.mapRight
+import com.custom.lib.toolbox.extensions.logger
+import com.custom.lib.toolbox.extensions.mapLeftEither
+import com.custom.lib.toolbox.extensions.mapRight
 import com.magic.front.warhammer40k.clients.CacheClient
 import com.magic.front.warhammer40k.clients.MagicClient
 import io.vavr.control.Either

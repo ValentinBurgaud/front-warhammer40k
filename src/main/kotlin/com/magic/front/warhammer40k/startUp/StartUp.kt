@@ -1,6 +1,6 @@
 package com.magic.front.warhammer40k.startUp
 
-import com.altima.lib.toolbox.extensions.logger
+import com.custom.lib.toolbox.extensions.logger
 import com.magic.front.warhammer40k.config.domain.Env
 import com.magic.front.warhammer40k.listeners.CacheMessage
 import org.flywaydb.core.Flyway

@@ -2,9 +2,9 @@ package com.magic.front.warhammer40k.services
 
 import com.magic.front.warhammer40k.clients.MagicClient
 import com.magic.front.warhammer40k.model.Card
-import com.altima.lib.toolbox.common.AppErrors
-import com.altima.lib.toolbox.extensions.mapEither
-import com.altima.lib.toolbox.extensions.mapRight
+import com.custom.lib.toolbox.common.AppErrors
+import com.custom.lib.toolbox.extensions.mapEither
+import com.custom.lib.toolbox.extensions.mapRight
 import com.magic.front.warhammer40k.clients.CardsCache
 import com.magic.front.warhammer40k.repository.CardsRepository
 import io.vavr.control.Either

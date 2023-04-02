@@ -1,9 +1,9 @@
 package com.magic.front.warhammer40k.common
 
-import com.altima.lib.toolbox.extensions.logger
-import com.altima.lib.toolbox.json.JsonExt
-import com.altima.lib.toolbox.json.JsonFormat
-import com.altima.lib.toolbox.common.AppErrors
+import com.custom.lib.toolbox.extensions.logger
+import com.custom.lib.toolbox.json.JsonExt
+import com.custom.lib.toolbox.json.JsonFormat
+import com.custom.lib.toolbox.common.AppErrors
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.fge.jsonpatch.JsonPatch
 import io.vavr.control.Either
