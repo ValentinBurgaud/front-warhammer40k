@@ -2,8 +2,10 @@ package com.magic.front.warhammer40k.repository
 
 import com.custom.lib.toolbox.extensions.preparedReactiveQuery
 import com.magic.front.warhammer40k.model.Card
+import io.vavr.kotlin.toVavrList
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.*
+import org.reactivecouchbase.json.Json
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 
@@ -48,15 +50,11 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.manaCost,
             card.cmc,
             //TODO Convertion problems
-//            JsonArray(Json.arr(card.color.map { it.uppercase() }.toVavrList()).stringify()),
-            arrayOf("ARRAY ['W', 'B', 'M']"),
-//            card.colorIdentity,
-            arrayOf("ARRAY ['W', 'B', 'M']"),
+            arrayOf(Json.arr(card.color.map { it.uppercase() }.toVavrList()).stringify()),
+            arrayOf(Json.arr(card.colorIdentity.map { it.uppercase() }.toVavrList()).stringify()),
             card.type,
-//            card.types,
-            arrayOf("ARRAY ['Créatures']"),
-//            card.subtypes,
-            arrayOf("ARRAY []"),
+            arrayOf(Json.arr(card.types.toVavrList()).stringify()),
+            arrayOf(Json.arr(card.subtypes.toVavrList()).stringify()),
             card.rarity,
             card.set,
             card.setName,
@@ -97,24 +95,25 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.name,
             card.manaCost,
             card.cmc,
-            card.color,
-            card.colorIdentity,
+            //TODO Convertion problems
+            arrayOf(Json.arr(card.color.map { it.uppercase() }.toVavrList()).stringify()),
+            arrayOf(Json.arr(card.colorIdentity.map { it.uppercase() }.toVavrList()).stringify()),
             card.type,
-            card.types,
-            card.subtypes,
+            arrayOf(Json.arr(card.types.toVavrList()).stringify()),
+            arrayOf(Json.arr(card.subtypes.toVavrList()).stringify()),
             card.rarity,
             card.set,
             card.setName,
             card.text,
             card.flavor,
             card.artist,
-            card.number,
-            card.power,
-            card.toughness,
-            card.imageUrl,
-            card.multiverseId,
-            card.legalities,
-            card.race,
+            card.number.toInt(),
+            card.power.getOrElse(0),
+            card.toughness.getOrElse(0),
+            card.imageUrl.getOrElse("A ajouter plus tard"),
+            card.multiverseId.orNull,
+            card.legalities.firstOrNull(),
+            card.race.getOrElse(""),
             card.id
         )
         return jdbcClient.preparedReactiveQuery(query, tuple) {}
