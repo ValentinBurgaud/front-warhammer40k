@@ -14,6 +14,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
+//TODO Ajouter image name et contentType
 data class Card(
     val id: UUID,
     val name: String,

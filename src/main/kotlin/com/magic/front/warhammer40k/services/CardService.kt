@@ -6,6 +6,7 @@ import com.custom.lib.toolbox.common.AppErrors
 import com.custom.lib.toolbox.extensions.mapEither
 import com.custom.lib.toolbox.extensions.mapRight
 import com.magic.front.warhammer40k.clients.CardsCache
+import com.magic.front.warhammer40k.model.parts.FilePart
 import com.magic.front.warhammer40k.repository.CardsRepository
 import io.vavr.control.Either
 import io.vavr.control.Option
@@ -61,6 +62,20 @@ class CardService(
 
     fun createCard(card: Card): Mono<Either<AppErrors, Card>> {
         return cardsRepository.insertCard(card).flatMap {
+            listCardBdd().mapEither { cards ->
+                cards.find { it.name == card.name && it.power == card.power }
+                    .option()
+                    .map {
+                        Either.right<AppErrors, Card>(it)
+                    }.getOrElse {
+                        Either.left(AppErrors.error("card.not.found"))
+                    }
+            }
+        }
+    }
+
+    fun createCard(file: FilePart, card: Card): Mono<Either<AppErrors, Card>> {
+        return cardsRepository.insertCard(card, file).flatMap {
             listCardBdd().mapEither { cards ->
                 cards.find { it.name == card.name && it.power == card.power }
                     .option()

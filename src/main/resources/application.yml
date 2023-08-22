@@ -1,0 +1,16 @@
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    root: INFO
+
+spring:
+  mvc:
+    async.request-timeout: -1
+  codec:
+    max-in-memory-size: 20MB
+
+cache:
+  ttl: ${CACHE_TTL_MINUTES:15}
+  heap: ${CHACHE_HEAP:20}

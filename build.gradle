@@ -29,6 +29,8 @@ dependencies {
 
     implementation 'org.ehcache:ehcache:3.10.6'
 
+    implementation 'org.apache.tika:tika-parsers:1.24'
+
     implementation 'org.flywaydb:flyway-core:9.16.0'
     implementation 'org.postgresql:postgresql:42.5.1'
     implementation 'io.vertx:vertx-pg-client:4.4.0'

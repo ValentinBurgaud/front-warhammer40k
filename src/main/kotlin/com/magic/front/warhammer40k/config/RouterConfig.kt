@@ -40,7 +40,12 @@ internal class RouterConfig {
                         DELETE("", cardHandler::deleteCard)
                         PATCH("", cardHandler::updateCard)
                     }
-                    POST("", cardHandler::createCard)
+                    contentType(MediaType.APPLICATION_JSON).nest {
+                        POST("", cardHandler::createCard)
+                    }
+                    contentType(MediaType.MULTIPART_FORM_DATA).nest {
+                        POST("", cardHandler::createCardWithImage)
+                    }
                 }
             }
             "/api/v1/both/cards".nest {

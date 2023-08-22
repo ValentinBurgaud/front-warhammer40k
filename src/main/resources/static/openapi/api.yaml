@@ -193,9 +193,6 @@ paths:
         ```
       tags:
         - cards
-      security:
-        - appId: [ ]
-          apiKey: [ ]
       parameters:
         - schema:
             type: string
@@ -207,7 +204,7 @@ paths:
             schema:
               type: object
               items:
-                $ref: '#/components/schemas/UpdateEvidence'
+                $ref: '#/components/schemas/UpdateCard'
 components:
   securitySchemes:
     appId:
@@ -379,7 +376,7 @@ tags:
     x-displayName: Le modèle card
     description: |
       <SchemaDefinition schemaRef="#/components/schemas/card"  showReadOnly={true} showWriteOnly={true}/>
-  - name: proposalDocument
+  - name: legality
     x-displayName: Le modèle legality
     description: |
       <SchemaDefinition schemaRef="#/components/schemas/legality" showReadOnly={true} showWriteOnly={true} />
