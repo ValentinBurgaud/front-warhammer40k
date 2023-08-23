@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS card
 (
     id                  UUID primary key default gen_random_uuid(),
     name                varchar(100) not null,
-    mana_cost            varchar(100) not null,
+    mana_cost           varchar(100) not null,
     cmc                 integer not null,
     color               text[],
     color_identity      text[],
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS card
     number              integer not null,
     power               integer not null,
     toughness           integer not null,
-    image               varchar(10000) not null,
+    image               bytea,
     multiverse_id       varchar(100),
     legalities          varchar(100),
     race                varchar(100) not null

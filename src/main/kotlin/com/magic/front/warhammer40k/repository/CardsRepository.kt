@@ -9,7 +9,6 @@ import io.vertx.sqlclient.*
 import org.reactivecouchbase.json.Json
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
-import java.util.Base64
 
 @Repository
 class CardsRepository(private val jdbcClient: PgPool) {
@@ -44,7 +43,7 @@ class CardsRepository(private val jdbcClient: PgPool) {
 
     fun insertCard(card: Card): Mono<Unit> {
         val query = """
-                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image_url, multiverse_id, legalities, race) 
+                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image, multiverse_id, legalities, race) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21);
             """
         val tuple = Tuple.of(
@@ -66,7 +65,8 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.number.toInt(),
             card.power.getOrElse(0),
             card.toughness.getOrElse(0),
-            card.imageUrl.getOrElse("A ajouter plus tard"),
+//            card.imageUrl.getOrElse("A ajouter plus tard"),
+            null,
             card.multiverseId.orNull,
             card.legalities.firstOrNull(),
             card.race.getOrElse("")
@@ -76,7 +76,7 @@ class CardsRepository(private val jdbcClient: PgPool) {
 
     fun insertCard(card: Card, file: FilePart): Mono<Unit> {
         val query = """
-                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image_url, multiverse_id, legalities, race) 
+                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image, multiverse_id, legalities, race) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21);
             """
         val tuple = Tuple.of(
@@ -98,7 +98,7 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.number.toInt(),
             card.power.getOrElse(0),
             card.toughness.getOrElse(0),
-            Base64.getEncoder().encode(file.inputStream.readAllBytes()),
+            file.inputStream.readAllBytes(),
             card.multiverseId.orNull,
             card.legalities.firstOrNull(),
             card.race.getOrElse("")
@@ -144,7 +144,8 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.number.toInt(),
             card.power.getOrElse(0),
             card.toughness.getOrElse(0),
-            card.imageUrl.getOrElse("A ajouter plus tard"),
+//            card.image.getOrElse("A ajouter plus tard"),
+            null,
             card.multiverseId.orNull,
             card.legalities.firstOrNull(),
             card.race.getOrElse(""),
