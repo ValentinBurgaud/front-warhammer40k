@@ -39,6 +39,11 @@ internal class RouterConfig {
                         GET("", cardHandler::getCardBddById)
                         DELETE("", cardHandler::deleteCard)
                         PATCH("", cardHandler::updateCard)
+                        "image".nest {
+                            accept(MediaType.APPLICATION_OCTET_STREAM).nest {
+                                GET("", cardHandler::downloadImage)
+                            }
+                        }
                     }
                     contentType(MediaType.APPLICATION_JSON).nest {
                         POST("", cardHandler::createCard)

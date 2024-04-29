@@ -1,14 +1,17 @@
 package com.magic.front.warhammer40k.model
 
 import com.custom.lib.toolbox.json.*
+import com.magic.front.warhammer40k.model.parts.FilePart
 import io.vavr.control.Option
 import io.vavr.kotlin.option
 import io.vavr.kotlin.toVavrList
+import io.vertx.core.buffer.Buffer
 import io.vertx.sqlclient.Row
 import org.reactivecouchbase.json.JsArray
 import org.reactivecouchbase.json.JsValue
 import org.reactivecouchbase.json.Json
 import org.reactivecouchbase.json.Syntax.`$`
+import java.io.BufferedReader
 import java.io.InputStream
 import java.math.BigDecimal
 import java.util.UUID
@@ -33,7 +36,7 @@ data class Card(
     val number: String,
     val power: Option<Int>,
     val toughness: Option<Int>,
-    val image: Option<InputStream>,
+    val image: Option<FilePart>,
     val multiverseId: Option<String>,
     val legalities: List<Legality>,
     val race: Option<String>
@@ -58,7 +61,7 @@ data class Card(
         var number: String = "",
         var power: Option<Int> = Option.none(),
         var toughness: Option<Int> = Option.none(),
-        var image: Option<InputStream> = Option.none(),
+        var image: Option<FilePart> = Option.none(),
         var multiverseId: Option<String> = Option.none(),
         var legalities: List<Legality> = emptyList(),
         var race: Option<String> = Option.none()
@@ -81,7 +84,7 @@ data class Card(
         fun number(number: String) = apply { this.number = number }
         fun power(power: Option<Int>) = apply { this.power = power }
         fun toughness(toughness: Option<Int>) = apply { this.toughness = toughness }
-        fun imageUrl(imageUrl: Option<InputStream>) = apply { this.image = imageUrl }
+        fun imageUrl(imageUrl: Option<FilePart>) = apply { this.image = imageUrl }
         fun multiverseId(multiverseId: Option<String>) = apply { this.multiverseId = multiverseId }
         fun legalities(legalities: List<Legality>) = apply { this.legalities = legalities }
         fun race(race: Option<String>) = apply { this.race = race }
@@ -211,7 +214,12 @@ data class Card(
                 number = row.getInteger("number").toString(),
                 power = row.getInteger("power").option(),
                 toughness = row.getInteger("toughness").option(),
-                image = row.getBuffer("image").bytes.inputStream().option(),
+                image = FilePart(
+                    fileName = row.getString("image_name").option().getOrElse(""),
+                    size = row.getLong("image_size").option().getOrElse(0),
+                    contentType = row.getString("image_content_type").option().getOrElse(""),
+                    inputStream = row.getBuffer("image").option().getOrElse(Buffer.buffer()).bytes.inputStream(),
+                ).option(),
                 multiverseId = row.getString("multiverse_id").option(),
                 legalities = emptyList(),
                 race = row.getString("race").option()
@@ -239,7 +247,13 @@ data class Card(
             `$`("number", number),
             `$`("power", power),
             `$`("toughness", toughness),
-//            `$`("image", image),
+            `$`("image", image.map { file ->
+                Json.obj(
+                    `$`("fileName", file.fileName),
+                    `$`("contentType", file.contentType),
+                    `$`("size", file.size),
+                )}
+            ),
             `$`("multiverseId", multiverseId),
             `$`("legalities", Json.array(legalities.toVavrList())),
             `$`("race", race),

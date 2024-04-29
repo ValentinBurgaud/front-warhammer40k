@@ -6,6 +6,7 @@ import com.custom.lib.toolbox.common.AppErrors
 import com.custom.lib.toolbox.extensions.mapEither
 import com.custom.lib.toolbox.extensions.mapRight
 import com.magic.front.warhammer40k.clients.CardsCache
+import com.magic.front.warhammer40k.model.parts.File
 import com.magic.front.warhammer40k.model.parts.FilePart
 import com.magic.front.warhammer40k.repository.CardsRepository
 import io.vavr.control.Either
@@ -43,6 +44,12 @@ class CardService(
     fun getCardByIdBdd(id: String): Mono<Either<AppErrors, Card>> {
         return cardsRepository.getCardById(id).map { cards ->
             Option.`when`(cards.isNotEmpty()) { cards }.toEither(AppErrors.error("card.not.found"))
+        }.mapRight { it.first() }
+    }
+
+    fun downloadCardById(id: String): Mono<Either<AppErrors, File>> {
+        return cardsRepository.downloadCardById(id).map { images ->
+            Option.`when`(images.isNotEmpty()) { images }.toEither(AppErrors.error("images.not.found"))
         }.mapRight { it.first() }
     }
 

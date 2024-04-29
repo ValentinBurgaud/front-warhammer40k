@@ -2,6 +2,7 @@ package com.magic.front.warhammer40k.repository
 
 import com.custom.lib.toolbox.extensions.preparedReactiveQuery
 import com.magic.front.warhammer40k.model.Card
+import com.magic.front.warhammer40k.model.parts.File
 import com.magic.front.warhammer40k.model.parts.FilePart
 import io.vavr.kotlin.toVavrList
 import io.vertx.pgclient.PgPool
@@ -30,6 +31,23 @@ class CardsRepository(private val jdbcClient: PgPool) {
         }
     }
 
+    fun downloadCardById(cardId: String): Mono<List<File>> {
+        val query =
+            """
+                SELECT image, image_name, image_content_type FROM CARD
+                WHERE id = $1
+            """
+
+        return jdbcClient.preparedReactiveQuery(query, Tuple.of(cardId)) { result ->
+            result.map { row ->
+                File.fromBdd(row)
+            }
+        }.contextWrite { ctx ->
+            ctx.put("sqlQuery", query)
+            ctx.put("poolName", "PgPool")
+        }
+    }
+
     fun listCards(): Mono<List<Card>> {
         val query = """
                 SELECT * FROM card
@@ -43,8 +61,8 @@ class CardsRepository(private val jdbcClient: PgPool) {
 
     fun insertCard(card: Card): Mono<Unit> {
         val query = """
-                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image, multiverse_id, legalities, race) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21);
+                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image, image_url, image_name, image_size, image_content_type, multiverse_id, legalities, race) 
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25);
             """
         val tuple = Tuple.of(
             card.name,
@@ -67,6 +85,10 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.toughness.getOrElse(0),
 //            card.imageUrl.getOrElse("A ajouter plus tard"),
             null,
+            null,
+            null,
+            null,
+            null,
             card.multiverseId.orNull,
             card.legalities.firstOrNull(),
             card.race.getOrElse("")
@@ -76,8 +98,8 @@ class CardsRepository(private val jdbcClient: PgPool) {
 
     fun insertCard(card: Card, file: FilePart): Mono<Unit> {
         val query = """
-                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image, multiverse_id, legalities, race) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21);
+                INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, image, image_url, image_name, image_size, image_content_type, multiverse_id, legalities, race) 
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25);
             """
         val tuple = Tuple.of(
             card.name,
@@ -99,6 +121,10 @@ class CardsRepository(private val jdbcClient: PgPool) {
             card.power.getOrElse(0),
             card.toughness.getOrElse(0),
             file.inputStream.readAllBytes(),
+            null,
+            file.fileName,
+            file.size,
+            file.contentType,
             card.multiverseId.orNull,
             card.legalities.firstOrNull(),
             card.race.getOrElse("")

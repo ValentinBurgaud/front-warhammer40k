@@ -13,9 +13,11 @@ import com.custom.lib.toolbox.extensions.*
 import com.magic.front.warhammer40k.asMultipart
 import com.magic.front.warhammer40k.model.Card
 import com.magic.front.warhammer40k.parsers.patch.Patches
+import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
@@ -182,6 +184,36 @@ class CardHandler(
                             .bodyValue(
                                 card.toJson().stringify()
                             )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling database", it)
+                internalServerError()
+            }
+    }
+
+    fun downloadImage(request: ServerRequest): Mono<ServerResponse> {
+        val cardId = request.pathVariable("cardId")
+        logger.info("Downloading image for Warhammer40k")
+
+        return cardValidator.checkCardId(cardId)
+            .flatMapEither { cardId -> cardService.downloadCardById(cardId) }
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "card.not.found" -> notFound("card with the specified id was not found")
+                            else -> internalServerError()
+                        }
+                    },
+                    { file ->
+                        ServerResponse.ok()
+                            .contentType(file.mediaType)
+                            .header(
+                                "Content-Disposition",
+                                "attachment; filename=\"${file.fileName}\"; filename*=UTF-8''${file.fileName}';"
+                            )
+                            .body(BodyInserters.fromResource(InputStreamResource(file.file)))
                     })
             }
             .onErrorOrEmptyResume {
