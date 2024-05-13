@@ -29,7 +29,7 @@ class EnvConfig(
             dataSourceConfig(
                 dataSourceConfigBuilder {
                     db("warhammer40k")
-                    port(5433)
+                    port(5432)
                     host("localhost")
                     username("warhammer40k")
                     password("warhammer40k")

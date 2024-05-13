@@ -39,7 +39,7 @@ class CardValidator(
                     *patch.operations.mapIndexed { i, op ->
                         Rule.invalidUnless(
                             AppError.error("array[$i].path".option(), "not.allowed",
-                            listOf("/name", "/manaCost", "/cmc", "/color", "/colorIdentity", "/type", "/types", "/subtypes", "/rarity", "/set", "/setName", "/text", "/flavor", "/artist", "number", "power", "toughness", "imageUrl", "multiverseId", "legalities", "race")
+                            listOf("/name", "/manaCost", "/cmc", "/color", "/colorIdentity", "/type", "/types", "/subtypes", "/rarity", "/set", "/setName", "/text", "/flavor", "/artist", "/number", "/power", "/toughness", "/multiverseId", "/legalities", "/race")
                         )) {
                             op.path.startsWith("/name") ||
                                 op.path.startsWith("/manaCost") ||
@@ -58,7 +58,6 @@ class CardValidator(
                                 op.path.startsWith("/number") ||
                                 op.path.startsWith("/power") ||
                                 op.path.startsWith("/toughness") ||
-                                op.path.startsWith("/imageUrl") ||
                                 op.path.startsWith("/multiverseId") ||
                                 op.path.startsWith("/legalities") ||
                                 op.path.startsWith("/race")
@@ -97,6 +96,6 @@ class CardValidator(
 
     val Card.vRace: Rule<AppError>
         get() = Rule.invalidWhen(AppError.error(Option.some("race"), "invalid.body")) {
-            race.isDefined
+            !race.isDefined
         }
 }

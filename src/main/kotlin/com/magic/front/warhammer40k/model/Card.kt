@@ -1,6 +1,7 @@
 package com.magic.front.warhammer40k.model
 
 import com.custom.lib.toolbox.json.*
+import com.magic.front.warhammer40k._uuid
 import com.magic.front.warhammer40k.model.parts.FilePart
 import io.vavr.control.Option
 import io.vavr.kotlin.option
@@ -36,7 +37,6 @@ data class Card(
     val number: String,
     val power: Option<Int>,
     val toughness: Option<Int>,
-    val image: Option<FilePart>,
     val multiverseId: Option<String>,
     val legalities: List<Legality>,
     val race: Option<String>
@@ -61,7 +61,6 @@ data class Card(
         var number: String = "",
         var power: Option<Int> = Option.none(),
         var toughness: Option<Int> = Option.none(),
-        var image: Option<FilePart> = Option.none(),
         var multiverseId: Option<String> = Option.none(),
         var legalities: List<Legality> = emptyList(),
         var race: Option<String> = Option.none()
@@ -84,16 +83,16 @@ data class Card(
         fun number(number: String) = apply { this.number = number }
         fun power(power: Option<Int>) = apply { this.power = power }
         fun toughness(toughness: Option<Int>) = apply { this.toughness = toughness }
-        fun imageUrl(imageUrl: Option<FilePart>) = apply { this.image = imageUrl }
         fun multiverseId(multiverseId: Option<String>) = apply { this.multiverseId = multiverseId }
         fun legalities(legalities: List<Legality>) = apply { this.legalities = legalities }
         fun race(race: Option<String>) = apply { this.race = race }
-        fun build() = Card(id, name, manaCost, cmc, color, colorIdentity, type, types, subtypes, rarity, set, setName, text, flavor, artist, number, power, toughness, image, multiverseId, legalities, race)
+        fun build() = Card(id, name, manaCost, cmc, color, colorIdentity, type, types, subtypes, rarity, set, setName, text, flavor, artist, number, power, toughness, multiverseId, legalities, race)
     }
     companion object {
 
         val format: JsonFormat<Card> = JsonFormat.of(
-            _string("name") { name -> Builder().name(name) }
+            _field("id", _uuid()) { id -> Builder().id(id) }
+                .and(_string("name")) { b, name -> b.name(name) }
                 .and(_string("manaCost")) { b, manaCost -> b.manaCost(manaCost) }
                 .and(_field("cmc", _bigDecimal(10))) { b, cmc -> b.cmc(cmc) }
                 .and(_list("color", _string())) { b, color -> b.color(color.asJava()) }
@@ -110,7 +109,6 @@ data class Card(
                 .and(_string("number")) { b, number -> b.number(number) }
                 .and(_opt("power", _int())) { b, power -> b.power(power) }
                 .and(_opt("toughness", _int())) { b, toughness -> b.toughness(toughness) }
-//                .and(_opt("image", _string())) { b, imageUrl -> b.imageUrl(imageUrl) }
                 .and(_opt("multiverseId", _string())) { b, multiverseId -> b.multiverseId(multiverseId) }
                 .and(_list("legalities", Legality.format.reader)) { b, legalities -> b.legalities(legalities.asJava()) }
                 .and(_opt("race", _string())) { b, race -> b.race(race) }
@@ -121,6 +119,7 @@ data class Card(
 
         fun asRequest(card: Card): JsValue {
             return Json.obj(
+                `$`("id", card.id.toString()),
                 `$`("name", card.name),
                 `$`("manaCost", card.manaCost),
                 `$`("cmc", card.cmc),
@@ -138,7 +137,6 @@ data class Card(
                 `$`("number", card.number),
                 `$`("power", card.power),
                 `$`("toughness", card.toughness),
-                `$`("image", card.image),
                 `$`("multiverseId", card.multiverseId),
                 `$`("legalities", Json.array(card.legalities.toVavrList())),
                 `$`("race", card.race)
@@ -165,8 +163,6 @@ data class Card(
                 number = json.string("number"),
                 power = json.field("power").asOptString().map { it.toInt() },
                 toughness = json.field("toughness").asOptString().map { it.toInt() },
-//                image = json.field("image").asOptString(),
-                image = Option.none(),
                 multiverseId = json.field("multiverseId").asOptString(),
                 legalities = json.array("legalities").toList().map { Legality.fromJsonMagicApi(it) },
                 race = json.field("race").asOptString()
@@ -214,12 +210,6 @@ data class Card(
                 number = row.getInteger("number").toString(),
                 power = row.getInteger("power").option(),
                 toughness = row.getInteger("toughness").option(),
-                image = FilePart(
-                    fileName = row.getString("image_name").option().getOrElse(""),
-                    size = row.getLong("image_size").option().getOrElse(0),
-                    contentType = row.getString("image_content_type").option().getOrElse(""),
-                    inputStream = row.getBuffer("image").option().getOrElse(Buffer.buffer()).bytes.inputStream(),
-                ).option(),
                 multiverseId = row.getString("multiverse_id").option(),
                 legalities = emptyList(),
                 race = row.getString("race").option()
@@ -247,13 +237,6 @@ data class Card(
             `$`("number", number),
             `$`("power", power),
             `$`("toughness", toughness),
-            `$`("image", image.map { file ->
-                Json.obj(
-                    `$`("fileName", file.fileName),
-                    `$`("contentType", file.contentType),
-                    `$`("size", file.size),
-                )}
-            ),
             `$`("multiverseId", multiverseId),
             `$`("legalities", Json.array(legalities.toVavrList())),
             `$`("race", race),

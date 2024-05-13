@@ -2,6 +2,7 @@ package com.magic.front.warhammer40k.config
 
 import com.magic.front.warhammer40k.handlers.CardHandler
 import com.custom.lib.toolbox.extensions.mesure
+import com.magic.front.warhammer40k.handlers.ImageHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
@@ -17,7 +18,8 @@ internal class RouterConfig {
 
     @Bean
     fun staticRoutes(
-            cardHandler: CardHandler
+            cardHandler: CardHandler,
+            imageHandler: ImageHandler
     ): RouterFunction<ServerResponse> {
         return router {
             accept(TEXT_HTML).nest {
@@ -39,17 +41,19 @@ internal class RouterConfig {
                         GET("", cardHandler::getCardBddById)
                         DELETE("", cardHandler::deleteCard)
                         PATCH("", cardHandler::updateCard)
-                        "image".nest {
-                            accept(MediaType.APPLICATION_OCTET_STREAM).nest {
-                                GET("", cardHandler::downloadImage)
-                            }
-                        }
                     }
                     contentType(MediaType.APPLICATION_JSON).nest {
                         POST("", cardHandler::createCard)
                     }
                     contentType(MediaType.MULTIPART_FORM_DATA).nest {
                         POST("", cardHandler::createCardWithImage)
+                    }
+                }
+            }
+            "/api/v1/images".nest {
+                "/card/{cardId}".nest {
+                    accept(MediaType.APPLICATION_OCTET_STREAM).nest {
+                        GET("", imageHandler::downloadImage)
                     }
                 }
             }

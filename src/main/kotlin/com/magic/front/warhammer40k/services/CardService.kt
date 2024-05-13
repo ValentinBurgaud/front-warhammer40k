@@ -3,12 +3,12 @@ package com.magic.front.warhammer40k.services
 import com.magic.front.warhammer40k.clients.MagicClient
 import com.magic.front.warhammer40k.model.Card
 import com.custom.lib.toolbox.common.AppErrors
-import com.custom.lib.toolbox.extensions.mapEither
-import com.custom.lib.toolbox.extensions.mapRight
+import com.custom.lib.toolbox.extensions.*
 import com.magic.front.warhammer40k.clients.CardsCache
 import com.magic.front.warhammer40k.model.parts.File
 import com.magic.front.warhammer40k.model.parts.FilePart
 import com.magic.front.warhammer40k.repository.CardsRepository
+import com.magic.front.warhammer40k.repository.ImagesRepository
 import io.vavr.control.Either
 import io.vavr.control.Option
 import io.vavr.kotlin.option
@@ -21,6 +21,7 @@ import reactor.kotlin.core.publisher.toMono
 class CardService(
     private val magicClient: MagicClient,
     private val cardsRepository: CardsRepository,
+    private val imageService: ImageService,
 ) {
     fun listCardWarhammer40KMagicApi(): Mono<Either<AppErrors, List<Card>>> {
         return magicClient.listCardsWarhammer()
@@ -44,12 +45,6 @@ class CardService(
     fun getCardByIdBdd(id: String): Mono<Either<AppErrors, Card>> {
         return cardsRepository.getCardById(id).map { cards ->
             Option.`when`(cards.isNotEmpty()) { cards }.toEither(AppErrors.error("card.not.found"))
-        }.mapRight { it.first() }
-    }
-
-    fun downloadCardById(id: String): Mono<Either<AppErrors, File>> {
-        return cardsRepository.downloadCardById(id).map { images ->
-            Option.`when`(images.isNotEmpty()) { images }.toEither(AppErrors.error("images.not.found"))
         }.mapRight { it.first() }
     }
 
@@ -81,8 +76,8 @@ class CardService(
         }
     }
 
-    fun createCard(file: FilePart, card: Card): Mono<Either<AppErrors, Card>> {
-        return cardsRepository.insertCard(card, file).flatMap {
+    fun createCardWithImage(file: FilePart, card: Card): Mono<Either<AppErrors, Card>> {
+        return cardsRepository.insertCard(card).flatMap {
             listCardBdd().mapEither { cards ->
                 cards.find { it.name == card.name && it.power == card.power }
                     .option()
@@ -91,6 +86,8 @@ class CardService(
                     }.getOrElse {
                         Either.left(AppErrors.error("card.not.found"))
                     }
+            }.flatMapEither { card ->
+                imageService.createImage(file, card.id).mapRight { card }
             }
         }
     }
@@ -100,10 +97,14 @@ class CardService(
     }
 
     fun updateCard(card: Card): Mono<Either<AppErrors, Card>> {
+//        return cardsRepository.updateCard(card)
+//            .flatMap { cardsRepository.getCardById(card.id.toString()) }
+//            .map { cards ->
+//                Option.`when`(cards.isNotEmpty()) { cards }.toEither(AppErrors.error("card.not.found"))
+//            }.mapRight { it.first() }
+
         return cardsRepository.updateCard(card)
-            .flatMap { cardsRepository.getCardById(card.id.toString()) }
-            .map { cards ->
-                Option.`when`(cards.isNotEmpty()) { cards }.toEither(AppErrors.error("card.not.found"))
-            }.mapRight { it.first() }
+            .map { _ -> Either.right<AppErrors, Card>(card) }
+//            .flatMap { cardsRepository.getCardById(card.id.toString()) }
     }
 }

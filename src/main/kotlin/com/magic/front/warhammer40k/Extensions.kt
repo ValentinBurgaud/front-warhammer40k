@@ -11,8 +11,10 @@ import io.vavr.collection.List
 import io.vavr.control.Either
 import io.vavr.control.Option
 import io.vavr.control.Try
+import io.vavr.kotlin.Try
 import io.vavr.kotlin.option
 import org.apache.tika.Tika
+import org.reactivecouchbase.json.JsString
 import org.reactivecouchbase.json.JsValue
 import org.reactivecouchbase.json.Json
 import org.slf4j.Logger
@@ -25,10 +27,23 @@ import reactor.kotlin.core.publisher.toMono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.util.*
 
 class Extensions {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(Extensions::class.java)
+    }
+}
+
+fun _uuid(): (JsValue) -> JsResult<UUID> {
+    return { json: JsValue ->
+        if (!Objects.isNull(json) && json.`is`(JsString::class.java) &&
+            json.asString().isNotBlank() &&
+            Try { UUID.fromString(json.asString()) }.isSuccess) {
+            JsResult.success(UUID.fromString(json.asString()))
+        } else {
+            JsResult.error(io.vavr.collection.List.of(JsResult.Error.error("uuid.expected")))
+        }
     }
 }
 
