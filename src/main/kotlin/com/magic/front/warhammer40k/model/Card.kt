@@ -2,22 +2,17 @@ package com.magic.front.warhammer40k.model
 
 import com.custom.lib.toolbox.json.*
 import com.magic.front.warhammer40k._uuid
-import com.magic.front.warhammer40k.model.parts.FilePart
 import io.vavr.control.Option
 import io.vavr.kotlin.option
 import io.vavr.kotlin.toVavrList
-import io.vertx.core.buffer.Buffer
 import io.vertx.sqlclient.Row
 import org.reactivecouchbase.json.JsArray
 import org.reactivecouchbase.json.JsValue
 import org.reactivecouchbase.json.Json
 import org.reactivecouchbase.json.Syntax.`$`
-import java.io.BufferedReader
-import java.io.InputStream
 import java.math.BigDecimal
 import java.util.UUID
 
-//TODO Ajouter image name et contentType
 data class Card(
     val id: UUID,
     val name: String,

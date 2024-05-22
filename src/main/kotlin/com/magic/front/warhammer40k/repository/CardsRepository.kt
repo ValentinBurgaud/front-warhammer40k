@@ -46,16 +46,16 @@ class CardsRepository(private val jdbcClient: PgPool) {
                 INSERT INTO card(name, mana_cost, cmc, color, color_identity, type, types, subtypes, rarity, set, set_name, text, flavor, artist, number, power, toughness, multiverse_id, legalities, race) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20);
             """
+
         val tuple = Tuple.of(
             card.name,
             card.manaCost,
             card.cmc,
-            //TODO Convertion problems
-            arrayOf(Json.arr(card.color.map { it.uppercase() }.toVavrList()).stringify()),
-            arrayOf(Json.arr(card.colorIdentity.map { it.uppercase() }.toVavrList()).stringify()),
+            card.color.toTypedArray(),
+            card.colorIdentity.toTypedArray(),
             card.type,
-            arrayOf(Json.arr(card.types.toVavrList()).stringify()),
-            arrayOf(Json.arr(card.subtypes.toVavrList()).stringify()),
+            card.types.toTypedArray(),
+            card.subtypes.toTypedArray(),
             card.rarity,
             card.set,
             card.setName,
