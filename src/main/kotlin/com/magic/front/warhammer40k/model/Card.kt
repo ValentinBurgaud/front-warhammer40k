@@ -91,6 +91,32 @@ data class Card(
     companion object {
 
         val format: JsonFormat<Card> = JsonFormat.of(
+            _string("name") { name -> Builder().name(name) }
+                .and(_string("manaCost")) { b, manaCost -> b.manaCost(manaCost) }
+                .and(_field("cmc", _bigDecimal(10))) { b, cmc -> b.cmc(cmc) }
+                .and(_list("color", _string())) { b, color -> b.color(color.asJava()) }
+                .and(_list("colorIdentity", _string())) { b, colorIdentity -> b.colorIdentity(colorIdentity.asJava()) }
+                .and(_string("type")) { b, type -> b.type(type) }
+                .and(_list("types", _string())) { b, types -> b.types(types.asJava()) }
+                .and(_list("subtypes", _string())) { b, subtypes -> b.subtypes(subtypes.asJava()) }
+                .and(_string("rarity")) { b, rarity -> b.rarity(rarity) }
+                .and(_string("set")) { b, set -> b.set(set) }
+                .and(_string("setName")) { b, setName -> b.setName(setName) }
+                .and(_string("text")) { b, text -> b.text(text) }
+                .and(_opt("flavor", _string())) { b, flavor -> b.flavor(flavor) }
+                .and(_string("artist")) { b, artist -> b.artist(artist) }
+                .and(_string("number")) { b, number -> b.number(number) }
+                .and(_opt("power", _int())) { b, power -> b.power(power) }
+                .and(_opt("toughness", _int())) { b, toughness -> b.toughness(toughness) }
+                .and(_opt("multiverseId", _string())) { b, multiverseId -> b.multiverseId(multiverseId) }
+                .and(_list("legalities", Legality.format.reader)) { b, legalities -> b.legalities(legalities.asJava()) }
+                .and(_opt("race", _string())) { b, race -> b.race(race) }
+                .map { it.build() }
+        ) { card ->
+            card.toJson()
+        }
+
+        val formatUpdate: JsonFormat<Card> = JsonFormat.of(
             _field("id", _uuid()) { id -> Builder().id(id) }
                 .and(_string("name")) { b, name -> b.name(name) }
                 .and(_string("manaCost")) { b, manaCost -> b.manaCost(manaCost) }

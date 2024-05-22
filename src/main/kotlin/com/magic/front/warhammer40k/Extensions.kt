@@ -64,14 +64,14 @@ fun <T> ServerRequest.asMultipart(reader: (JsValue) -> JsResult<T>, authorizedDo
                             when {
                                 filePart is Option.None -> Either.left<AppErrors, MultiPart<Card>>(AppErrors.error("unable.to.read.file")).toMono()
                                 metadataPart is Option.None -> Either.left<AppErrors, MultiPart<Card>>(AppErrors.error("metadata.json.empty")).toMono()
-//                                authorizedDocTypes.none { authorizedType ->
-//                                    authorizedType == headers["content-type"].option().map { type -> type.substringBefore(';') }
-//                                        .getOrElse("")
-//                                } -> {
-//                                    val contentType = headers["content-type"].option().map { type -> type.substringBefore(';') }.getOrElse("")
-//                                    Extensions.logger.info(" --- got wrong content-type {}", contentType)
-//                                    Either.left<AppErrors, MultiPart<Card>>(AppErrors.error("file".option(), "content.type.unsupported", *authorizedDocTypes.toTypedArray())).toMono()
-//                                }
+                                authorizedDocTypes.none { authorizedType ->
+                                    authorizedType == headers["content-type"].option().map { type -> type.substringBefore(';') }
+                                        .getOrElse("")
+                                } -> {
+                                    val contentType = headers["content-type"].option().map { type -> type.substringBefore(';') }.getOrElse("")
+                                    Extensions.logger.info(" --- got wrong content-type {}", contentType)
+                                    Either.left<AppErrors, MultiPart<Card>>(AppErrors.error("file".option(), "content.type.unsupported", *authorizedDocTypes.toTypedArray())).toMono()
+                                }
                                 else -> {
                                     val contentType = headers["content-type"].option().map { type -> type.substringBefore(';') }.get()
                                     val contentDisposition = headers["content-disposition"].option().get().split("; ")

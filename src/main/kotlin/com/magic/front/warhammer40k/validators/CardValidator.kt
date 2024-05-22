@@ -72,7 +72,7 @@ class CardValidator(
                         JsonPatch.apply(
                             card,
                             JsonExt.toJson(patch, Patches.format).asJsonNode(),
-                            JsonFormat.of(Card.format.reader) { p -> Card.asRequest(p) }
+                            JsonFormat.of(Card.formatUpdate.reader) { p -> Card.asRequest(p) }
                         )
                     }.flatMap {
                         Rule.combine(

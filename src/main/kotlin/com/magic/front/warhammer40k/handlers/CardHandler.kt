@@ -25,8 +25,7 @@ class CardHandler(
     val cardValidator: CardValidator
 ) {
     // TODO a déplacer
-    private val authorizedImageType = listOf("\"image/jpg\", \"image/jpeg\", \"image/pjpeg\", \"image/png\"")
-//    private val authorizedImageType = listOf("image/jpg, image/jpeg, image/pjpeg, image/png")
+    private val authorizedImageType = listOf("image/jpg", "image/jpeg", "image/pjpeg", "image/png")
 
     fun listCardWarhammer40k(request: ServerRequest): Mono<ServerResponse> {
         logger.info("Listing Magic cards for Warhammer40k")
