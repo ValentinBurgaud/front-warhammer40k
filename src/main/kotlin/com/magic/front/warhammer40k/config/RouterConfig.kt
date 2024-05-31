@@ -57,6 +57,7 @@ internal class RouterConfig {
                     accept(MediaType.APPLICATION_OCTET_STREAM).nest {
                         GET("", imageHandler::downloadImage)
                     }
+                    POST("", imageHandler::addImageOnCard)
                 }
             }
             "/api/v1/both/cards".nest {

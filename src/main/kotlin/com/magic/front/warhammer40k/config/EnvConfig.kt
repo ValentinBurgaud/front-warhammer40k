@@ -41,7 +41,7 @@ class EnvConfig(
             dataSourceConfig(
                 dataSourceConfigBuilder {
                     db("warhammer40kDocker")
-                    port(32769)
+                    port(32768)
                     host("localhost")
                     username("warhammer40k")
                     password("warhammer40k")

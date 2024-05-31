@@ -125,3 +125,63 @@ fun <T> ServerRequest.asMultipart(reader: (JsValue) -> JsResult<T>, authorizedDo
                 .toEither(AppErrors.error("file".option(), "content.type.mismatch", multiPart.file.contentType, inspectedContentType))
         }
     }
+
+fun ServerRequest.asMultipart(authorizedDocTypes: kotlin.collections.List<String>): Mono<Either<AppErrors, FilePart>> =
+    Option.ofOptional(headers().contentType()).getOrElse { MediaType.APPLICATION_JSON }.let { media ->
+        Extensions.logger.info(" --- got content type {}", media)
+        when (media.toString().substringBefore(';')) {
+            MediaType.MULTIPART_FORM_DATA_VALUE -> {
+                body(BodyExtractors.toMultipartData())
+                    .flatMap { parts ->
+                        Extensions.logger.info(" --- toMultipartData ok")
+                        val filePart = parts.toSingleValueMap()["file"].option()
+                        if (filePart.isEmpty) {
+                            Either.left<AppErrors, FilePart>(AppErrors.error("file.is.required")).toMono()
+                        } else {
+                            val headers = filePart.map { it.headers().toSingleValueMap().mapKeys { (key) -> key.lowercase() } }
+                                .getOrElse { emptyMap<String, String>() }
+                            when {
+                                filePart is Option.None -> Either.left<AppErrors, FilePart>(AppErrors.error("unable.to.read.file")).toMono()
+                                authorizedDocTypes.none { authorizedType ->
+                                    authorizedType == headers["content-type"].option().map { type -> type.substringBefore(';') }
+                                        .getOrElse("")
+                                } -> {
+                                    val contentType = headers["content-type"].option().map { type -> type.substringBefore(';') }.getOrElse("")
+                                    Extensions.logger.info(" --- got wrong content-type {}", contentType)
+                                    Either.left<AppErrors, FilePart>(AppErrors.error("file".option(), "content.type.unsupported", *authorizedDocTypes.toTypedArray())).toMono()
+                                }
+                                else -> {
+                                    val contentType = headers["content-type"].option().map { type -> type.substringBefore(';') }.get()
+                                    val contentDisposition = headers["content-disposition"].option().get().split("; ")
+                                    val fileName: String = contentDisposition.first { value -> value.startsWith("filename=") }
+                                        .split("=")[1]
+                                        .replace("\"", "")
+
+                                    val filePartBuilder = FilePart.Builder(contentType, fileName)
+
+                                    filePart.get().content().reduce(filePartBuilder) { accFile, next ->
+                                        accFile.collectInputStream(next.asInputStream(true), next.readableByteCount().toLong())
+                                    }.map { part ->
+                                        part.inputStream.toEither(AppErrors.error("unable.to.read.file")).map { part.build() }
+                                    }
+                                }
+                            }
+                        }
+                    }
+            }
+            else -> Either.left<AppErrors, FilePart>(AppErrors.error("unsupported.media.type")).toMono()
+        }.mapEither { file ->
+            Option.`when`(file.size < 15728640, file).toEither(AppErrors.error("file.too.large"))
+        }.mapEither { file ->
+            val baos = ByteArrayOutputStream()
+            file.inputStream.transferTo(baos)
+            val firstClone: InputStream = ByteArrayInputStream(baos.toByteArray())
+            val secondClone: InputStream = ByteArrayInputStream(baos.toByteArray())
+            val inspectedContentType: String = Tika().detect(firstClone)
+            Extensions.logger.debug(" --- inspectedContentType {}", inspectedContentType)
+            Extensions.logger.debug(" --- actual contentType {}", file.contentType)
+            Extensions.logger.debug(" --- file size {}", file.size)
+            Option.`when`( file.contentType == inspectedContentType, file.copy(inputStream = secondClone))
+                .toEither(AppErrors.error("file".option(), "content.type.mismatch", file.contentType, inspectedContentType))
+        }
+    }

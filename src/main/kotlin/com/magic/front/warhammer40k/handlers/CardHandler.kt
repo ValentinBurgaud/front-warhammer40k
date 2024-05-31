@@ -1,20 +1,15 @@
 package com.magic.front.warhammer40k.handlers
 
-//import com.custom.lib.toolbox.errors.internalServerError
-//import com.custom.lib.toolbox.errors.notFound
-//import com.custom.lib.toolbox.errors.status
-import com.magic.front.warhammer40k.model.Card.Companion.toJson
-import com.magic.front.warhammer40k.services.CardService
-import com.magic.front.warhammer40k.validators.CardValidator
 import com.custom.lib.toolbox.extensions.*
 import com.magic.front.warhammer40k.asMultipart
 import com.magic.front.warhammer40k.model.*
+import com.magic.front.warhammer40k.model.Card.Companion.toJson
 import com.magic.front.warhammer40k.parsers.patch.Patches
-import org.springframework.core.io.InputStreamResource
+import com.magic.front.warhammer40k.services.CardService
+import com.magic.front.warhammer40k.validators.CardValidator
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
@@ -191,8 +186,8 @@ class CardHandler(
     fun createCard(request: ServerRequest): Mono<ServerResponse> {
         logger.info("Create card in database")
 
-        //TODO validator on data
         return request.readBodyUsing(Card.format.reader)
+            .mapEither { card -> cardValidator.validateCreation(card) }
             .flatMapEither {
                 cardService.createCard(it)
             }
@@ -221,8 +216,8 @@ class CardHandler(
     fun createCardWithImage(request: ServerRequest): Mono<ServerResponse> {
         logger.info("Create card with image in database")
 
-        //TODO validator on data
         return request.asMultipart(Card.format.reader, authorizedImageType)
+            .mapEither { multipart -> cardValidator.validateCreation(multipart.metadata).map { multipart } }
             .flatMapEither {
                 cardService.createCardWithImage(it.file, it.metadata)
             }
