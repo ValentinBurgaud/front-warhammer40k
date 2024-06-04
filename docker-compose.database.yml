@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  warhammer40k-database:
+    image: postgres:latest
+    container_name: Warhammer40k-Database
+    environment:
+      POSTGRES_USER: warhammer40k
+      POSTGRES_PASSWORD: warhammer40k
+      POSTGRES_DB: warhammer40kDocker
+    ports:
+      - "32768:5432"
+    volumes:
+      - database-warhammer40k:/var/lib/postgresql/data
+
+volumes:
+  database-warhammer40k:
+    external: true
