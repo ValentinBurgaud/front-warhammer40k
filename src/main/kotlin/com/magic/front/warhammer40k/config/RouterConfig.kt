@@ -2,6 +2,8 @@ package com.magic.front.warhammer40k.config
 
 import com.magic.front.warhammer40k.handlers.CardHandler
 import com.custom.lib.toolbox.extensions.mesure
+import com.magic.front.warhammer40k.handlers.ImageHandler
+import com.magic.front.warhammer40k.handlers.StaticListHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
@@ -17,7 +19,9 @@ internal class RouterConfig {
 
     @Bean
     fun staticRoutes(
-            cardHandler: CardHandler
+            cardHandler: CardHandler,
+            imageHandler: ImageHandler,
+            staticListHandler: StaticListHandler
     ): RouterFunction<ServerResponse> {
         return router {
             accept(TEXT_HTML).nest {
@@ -40,7 +44,20 @@ internal class RouterConfig {
                         DELETE("", cardHandler::deleteCard)
                         PATCH("", cardHandler::updateCard)
                     }
-                    POST("", cardHandler::createCard)
+                    contentType(MediaType.APPLICATION_JSON).nest {
+                        POST("", cardHandler::createCard)
+                    }
+                    contentType(MediaType.MULTIPART_FORM_DATA).nest {
+                        POST("", cardHandler::createCardWithImage)
+                    }
+                }
+            }
+            "/api/v1/images".nest {
+                "/card/{cardId}".nest {
+                    accept(MediaType.APPLICATION_OCTET_STREAM).nest {
+                        GET("", imageHandler::downloadImage)
+                    }
+                    POST("", imageHandler::addImageOnCard)
                 }
             }
             "/api/v1/both/cards".nest {
@@ -52,6 +69,9 @@ internal class RouterConfig {
                 "".nest {
                     GET("", cardHandler::listCardWithCache)
                 }
+            }
+            "/api/v1/static-lists".nest {
+                GET("", staticListHandler::getColor)
             }
         }.mesure()
     }

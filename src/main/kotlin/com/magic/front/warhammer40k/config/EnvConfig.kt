@@ -26,10 +26,22 @@ class EnvConfig(
                     baseUrl("https://api.magicthegathering.io")
                 }
             )
+            // LocalDatabase
+//            dataSourceConfig(
+//                dataSourceConfigBuilder {
+//                    db("warhammer40k")
+//                    port(5432)
+//                    host("localhost")
+//                    username("warhammer40k")
+//                    password("warhammer40k")
+//                    maximumPoolSize(10)
+//                }
+//            )
+            // Docker Database
             dataSourceConfig(
                 dataSourceConfigBuilder {
-                    db("warhammer40k")
-                    port(5433)
+                    db("warhammer40kDocker")
+                    port(32768)
                     host("localhost")
                     username("warhammer40k")
                     password("warhammer40k")

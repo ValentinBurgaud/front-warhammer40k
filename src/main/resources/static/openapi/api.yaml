@@ -163,8 +163,8 @@ paths:
       description: |
         Cette API utlise le format JSON Patch spécifié dans la [RFC 6902](http://tools.ietf.org/html/rfc6902).
         
-        JSON Patch est un format permettant de décrire les modifications apportées à un document JSON, en l'occurrence la personne. Ce format peut être utilisé pour éviter d'envoyer un document entier lorsqu'une partie seulement a été modifiée. Dans notre cas il est utilisé en combinaison avec la méthode HTTP PATCH,
-        et il permet des mises à jour partielles de la personne d'une manière conforme aux normes.
+        JSON Patch est un format permettant de décrire les modifications apportées à un document JSON, en l'occurrence la carte. Ce format peut être utilisé pour éviter d'envoyer un document entier lorsqu'une partie seulement a été modifiée. Dans notre cas il est utilisé en combinaison avec la méthode HTTP PATCH,
+        et il permet des mises à jour partielles de la carte d'une manière conforme aux normes.
         
         Les opérations patchs sont eux-mêmes des documents JSON.
         
@@ -193,9 +193,6 @@ paths:
         ```
       tags:
         - cards
-      security:
-        - appId: [ ]
-          apiKey: [ ]
       parameters:
         - schema:
             type: string
@@ -205,9 +202,9 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              type: array
               items:
-                $ref: '#/components/schemas/UpdateEvidence'
+                $ref: '#/components/schemas/UpdateCard'
 components:
   securitySchemes:
     appId:
@@ -379,7 +376,7 @@ tags:
     x-displayName: Le modèle card
     description: |
       <SchemaDefinition schemaRef="#/components/schemas/card"  showReadOnly={true} showWriteOnly={true}/>
-  - name: proposalDocument
+  - name: legality
     x-displayName: Le modèle legality
     description: |
       <SchemaDefinition schemaRef="#/components/schemas/legality" showReadOnly={true} showWriteOnly={true} />

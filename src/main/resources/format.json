@@ -1,0 +1,30 @@
+{
+  "colorIdentity": [
+    "L",
+    "w",
+    "B"
+  ],
+  "set": "40k",
+  "color": [
+    "L",
+    "w",
+    "B"
+  ],
+  "power": 3,
+  "artist": "Daarken",
+  "number": "1",
+  "rarity": "Mythic",
+  "name": "Be'lakor, le Maître des Ténèbres",
+  "text": "Vol\\nPrince du Chaos - Quand Be'lakor, le Maître des Ténèbres arrive sur le champs de bataille, vous piochez X cartes et vous perdez X point de vie, X éant le nombre de démons que vous contrôlez.\\nSeigneur du Tourment - A chaque fois qu'un autre démon arrive sur le champs de bataille sous votre contrôle, il inflige un nombre de blessures égal à sa force à n'importe quelle cible.",
+  "setName": "Warhammer 40,000 Commander",
+  "race": "Chaos",
+  "toughness": 3,
+  "legalities": [],
+  "manaCost": "{3}{L}{W}{B}",
+  "types": [
+    "Creature"
+  ],
+  "cmc": 4,
+  "subtypes": [],
+  "type": "Créature légendaire - démon et noble"
+}

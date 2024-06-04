@@ -32,6 +32,10 @@ class CardValidator(
         }
     }
 
+    fun validateCreation(card: Card): Either<AppErrors, Card> {
+        return card.vCreation.toEither(card).mapLeft { AppErrors.errors(it.asJava()) }
+    }
+
     fun validateCardPatch(patch: Patches, cardId: String): Mono<Either<AppErrors, Pair<Patches, Card>>> {
         return cardService.getCardByIdBdd(cardId)
             .mapEither { card ->
@@ -39,7 +43,7 @@ class CardValidator(
                     *patch.operations.mapIndexed { i, op ->
                         Rule.invalidUnless(
                             AppError.error("array[$i].path".option(), "not.allowed",
-                            listOf("/name", "/manaCost", "/cmc", "/color", "/colorIdentity", "/type", "/types", "/subtypes", "/rarity", "/set", "/setName", "/text", "/flavor", "/artist", "number", "power", "toughness", "imageUrl", "multiverseId", "legalities", "race")
+                            listOf("/name", "/manaCost", "/cmc", "/color", "/colorIdentity", "/type", "/types", "/subtypes", "/rarity", "/set", "/setName", "/text", "/flavor", "/artist", "/number", "/power", "/toughness", "/multiverseId", "/legalities", "/race")
                         )) {
                             op.path.startsWith("/name") ||
                                 op.path.startsWith("/manaCost") ||
@@ -58,7 +62,6 @@ class CardValidator(
                                 op.path.startsWith("/number") ||
                                 op.path.startsWith("/power") ||
                                 op.path.startsWith("/toughness") ||
-                                op.path.startsWith("/imageUrl") ||
                                 op.path.startsWith("/multiverseId") ||
                                 op.path.startsWith("/legalities") ||
                                 op.path.startsWith("/race")
@@ -73,7 +76,7 @@ class CardValidator(
                         JsonPatch.apply(
                             card,
                             JsonExt.toJson(patch, Patches.format).asJsonNode(),
-                            JsonFormat.of(Card.format.reader) { p -> Card.asRequest(p) }
+                            JsonFormat.of(Card.formatUpdate.reader) { p -> Card.asRequest(p) }
                         )
                     }.flatMap {
                         Rule.combine(
@@ -90,6 +93,22 @@ class CardValidator(
             vRace
         )
 
+    val Card.vCreation: Rule<AppError>
+        get() = Rule.combine(
+            vName,
+            vRace,
+            vManaCost,
+            vColor,
+            vColorIdentity,
+            vType,
+            vRarity,
+            vSet,
+            vSetName,
+            vText,
+            vPower,
+            vToughness
+        )
+
     val Card.vName: Rule<AppError>
         get() = Rule.invalidWhen(AppError.error(Option.some("name"), "invalid.body")) {
             name.isEmpty()
@@ -97,6 +116,56 @@ class CardValidator(
 
     val Card.vRace: Rule<AppError>
         get() = Rule.invalidWhen(AppError.error(Option.some("race"), "invalid.body")) {
-            race.isDefined
+            !race.isDefined
+        }
+
+    val Card.vManaCost: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("manaCost"), "invalid.body")) {
+            manaCost.isEmpty()
+        }
+
+    val Card.vColor: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("color"), "invalid.body")) {
+            color.isEmpty()
+        }
+
+    val Card.vColorIdentity: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("colorIdentity"), "invalid.body")) {
+            colorIdentity.isEmpty()
+        }
+
+    val Card.vType: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("type"), "invalid.body")) {
+            type.isEmpty()
+        }
+
+    val Card.vRarity: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("rarity"), "invalid.body")) {
+            rarity.isEmpty()
+        }
+
+    val Card.vSet: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("set"), "invalid.body")) {
+            set.isEmpty()
+        }
+
+    val Card.vSetName: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("setName"), "invalid.body")) {
+            setName.isEmpty()
+        }
+
+    val Card.vText: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("set"), "invalid.body")) {
+            set.isEmpty()
+        }
+
+    val Card.vPower: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("power"), "invalid.body")) {
+            !power.isDefined
+        }
+
+    val Card.vToughness: Rule<AppError>
+        get() = Rule.invalidWhen(AppError.error(Option.some("toughness"), "invalid.body")) {
+            !toughness.isDefined
         }
 }

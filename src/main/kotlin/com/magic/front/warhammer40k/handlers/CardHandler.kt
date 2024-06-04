@@ -1,13 +1,13 @@
 package com.magic.front.warhammer40k.handlers
 
+import com.custom.lib.toolbox.extensions.*
+import com.magic.front.warhammer40k.asMultipart
+import com.magic.front.warhammer40k.model.*
 import com.magic.front.warhammer40k.model.Card.Companion.toJson
+import com.magic.front.warhammer40k.parsers.patch.Patches
 import com.magic.front.warhammer40k.services.CardService
 import com.magic.front.warhammer40k.validators.CardValidator
-import com.custom.lib.toolbox.errors.internalServerError
-import com.custom.lib.toolbox.errors.notFound
-import com.custom.lib.toolbox.extensions.*
-import com.magic.front.warhammer40k.model.Card
-import com.magic.front.warhammer40k.parsers.patch.Patches
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -19,6 +19,9 @@ class CardHandler(
     val cardService: CardService,
     val cardValidator: CardValidator
 ) {
+    // TODO a déplacer
+    private val authorizedImageType = listOf("image/jpg", "image/jpeg", "image/pjpeg", "image/png")
+
     fun listCardWarhammer40k(request: ServerRequest): Mono<ServerResponse> {
         logger.info("Listing Magic cards for Warhammer40k")
 
@@ -183,8 +186,8 @@ class CardHandler(
     fun createCard(request: ServerRequest): Mono<ServerResponse> {
         logger.info("Create card in database")
 
-        //TODO validator on data
         return request.readBodyUsing(Card.format.reader)
+            .mapEither { card -> cardValidator.validateCreation(card) }
             .flatMapEither {
                 cardService.createCard(it)
             }
@@ -193,6 +196,40 @@ class CardHandler(
                     { errors ->
                         when (errors.errors[0].message) {
                             "card.not.found" -> notFound("card with the specified id was not found")
+                            else -> internalServerError()
+                        }
+                    },
+                    { card ->
+                        ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(
+                                card.toJson().stringify()
+                            )
+                    })
+            }
+            .onErrorOrEmptyResume {
+                logger.error("an error occurred while calling database", it)
+                internalServerError()
+            }
+    }
+
+    fun createCardWithImage(request: ServerRequest): Mono<ServerResponse> {
+        logger.info("Create card with image in database")
+
+        return request.asMultipart(Card.format.reader, authorizedImageType)
+            .mapEither { multipart -> cardValidator.validateCreation(multipart.metadata).map { multipart } }
+            .flatMapEither {
+                cardService.createCardWithImage(it.file, it.metadata)
+            }
+            .flatMap { either ->
+                either.fold(
+                    { errors ->
+                        when (errors.errors[0].message) {
+                            "card.not.found" -> notFound("card with the specified id was not found")
+                            "content.type.unsupported" -> status(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Invalid body", errors)
+                            "file.too.large" -> status(HttpStatus.PAYLOAD_TOO_LARGE, "Invalid body", errors)
+                            "unable.to.read.file" -> status(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid body", errors)
+                            "content.type.mismatch" -> status(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Invalid body", errors)
                             else -> internalServerError()
                         }
                     },
@@ -234,8 +271,10 @@ class CardHandler(
             .flatMap { either ->
                 either.fold(
                     { errors ->
+                        logger.info("Erreur : {}", errors.errors[0].message)
                         when (errors.errors[0].message) {
                             "card.not.found" -> notFound("card with the specified id was not found")
+                            "invalid.body" -> badRequest("Invalid body", errors)
                             else -> internalServerError()
                         }
                     },
