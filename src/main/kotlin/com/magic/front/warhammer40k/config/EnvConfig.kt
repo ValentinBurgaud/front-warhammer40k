@@ -41,8 +41,8 @@ class EnvConfig(
             dataSourceConfig(
                 dataSourceConfigBuilder {
                     db("warhammer40kDocker")
-                    port(32768)
-                    host("localhost")
+                    port(5432)
+                    host("warhammer40k-database")
                     username("warhammer40k")
                     password("warhammer40k")
                     maximumPoolSize(10)

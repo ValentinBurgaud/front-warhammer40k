@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  warhammer40k-api:
+    image: openjdk:17-jdk-slim
+    container_name: Warhammer40k-API
+    ports:
+      - "32769:8080"
+    volumes:
+      - ./build/libs:/app
+    command: ["java", "-jar", "/app/warhammer40k-1.0.0-SNAPSHOT.jar"]
